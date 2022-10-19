@@ -14,12 +14,11 @@ int __stdcall WinMain(
 	_In_		int nCmdShow
 )
 {
-
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	UNREFERENCED_PARAMETER(nCmdShow);
 
-	Application app(1280, 780, hInstance);
+	Application app(1280, 780, hInstance, Application::USING_API_TYPE::DIRECTX_12);
 
 	if (app.Init())
 	{

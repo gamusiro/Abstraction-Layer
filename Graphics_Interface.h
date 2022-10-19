@@ -5,17 +5,23 @@
 *		Detail	: 
 ===================================================================================*/
 #pragma once
-#include "Virtual_Definitions.h"
+#include <DirectXMath.h>
+
+//**************************************************
+/// \brief Object release macro
+/// 
+/// \return none
+//**************************************************
+#define SAFE_RELEASE(p)\
+	if(p)	p->Release();\
+	p = nullptr;\
 
 class IGraphics
 {
 public:
-	virtual bool Init()		= 0;
-	virtual void Uninit()	= 0;
-	virtual void Clear()	= 0;
-	virtual void Present()	= 0;
-
-protected:
-	VDevice*	m_device;
-	VContext*	m_context;
+	virtual ~IGraphics() {};
+	virtual bool Init(int width, int height, void* handle)	= 0;
+	virtual void Uninit()									= 0;
+	virtual void Clear()									= 0;
+	virtual void Present()									= 0;
 };

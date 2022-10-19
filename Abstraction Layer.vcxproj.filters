@@ -6,10 +6,15 @@
     <ClCompile Include="Window_Desktop.cpp">
       <Filter>Window</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics_DirectX11.cpp">
+      <Filter>Graphics\DirectX\11</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics_DirectX12.cpp">
+      <Filter>Graphics\DirectX\12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
-    <ClInclude Include="Virtual_Definitions.h" />
     <ClInclude Include="Window_Desktop.h">
       <Filter>Window</Filter>
     </ClInclude>
@@ -22,6 +27,12 @@
     <ClInclude Include="Graphics_Interface.h">
       <Filter>Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics_DirectX11.h">
+      <Filter>Graphics\DirectX\11</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics_DirectX12.h">
+      <Filter>Graphics\DirectX\12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Window">
@@ -29,6 +40,15 @@
     </Filter>
     <Filter Include="Graphics">
       <UniqueIdentifier>{ef9306e4-4aea-4aa7-9b7f-75a419586795}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\DirectX">
+      <UniqueIdentifier>{45a9ab5c-2bb5-4bba-ba8e-d6a763189348}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\DirectX\11">
+      <UniqueIdentifier>{a30e3cdc-abb2-463f-a11f-1930bb85c6ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\DirectX\12">
+      <UniqueIdentifier>{a4779d6a-52b9-44b2-a8d5-d598a5fbf98d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

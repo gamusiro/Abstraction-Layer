@@ -5,12 +5,22 @@
 *		Detail	:
 ===================================================================================*/
 #pragma once
-#include "Virtual_Definitions.h"	// Virtual define header
 
 /*  Application class  */
 #include "Window_Desktop.h"
+
+class IGraphics;
+
 class Application : public WindowDesktop
 {
+public:
+	enum class USING_API_TYPE
+	{
+		DIRECTX_11,
+		DIRECTX_12,
+		OPENGL,
+	};
+
 public:
 	//**************************************************
 	/// \brief Application class constructor
@@ -24,8 +34,16 @@ public:
 	Application(
 		const int	width,
 		const int	height,
-		const void* hInstance
+		const void* hInstance,
+		USING_API_TYPE type
 	);
+
+	//**************************************************
+	/// \brief Destructor
+	/// 
+	/// \return none
+	//**************************************************
+	~Application();
 
 	//**************************************************
 	/// \brief Initialize application
@@ -54,5 +72,15 @@ public:
 	/// \return none
 	//**************************************************
 	void Draw();
+
+	//**************************************************
+	/// \brief Graphics class pointer
+	///  
+	/// \return pointer of graphics class
+	//**************************************************
+	static IGraphics* Graphics();
+
+private:
+	static IGraphics* m_graphics;
 };
 
