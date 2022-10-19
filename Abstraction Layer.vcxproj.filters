@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Application.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Window_Desktop.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Application.h" />
+    <ClInclude Include="Virtual_Definitions.h" />
+    <ClInclude Include="Window_Desktop.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window_Desktop_Procedure.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window_Interface.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics_Interface.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Window">
+      <UniqueIdentifier>{de644a07-f528-4df5-9ec9-4ffa69571dfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{ef9306e4-4aea-4aa7-9b7f-75a419586795}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
