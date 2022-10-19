@@ -44,6 +44,20 @@ class GraphicsDirectX12 : public IGraphics
 	//**************************************************
 	void Present() override;
 
+	//**************************************************
+	/// \brief Get device pointer
+	/// 
+	/// \return device pointer
+	//**************************************************
+	void* Device() override;
+
+	//**************************************************
+	/// \brief Get context pointer
+	/// 
+	/// \return context pointer
+	//**************************************************
+	void* Context() override;
+
 private:
 	//**************************************************
 	/// \brief Create device and swapchain

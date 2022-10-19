@@ -145,6 +145,18 @@ void GraphicsDirectX12::Present()
 	m_swapChain->Present(1, 0);
 }
 
+/* Get device pointer */
+void* GraphicsDirectX12::Device()
+{
+	return m_device;
+}
+
+/* Get context pointer */
+void* GraphicsDirectX12::Context()
+{
+	return m_commandList;
+}
+
 // Create device and swapchain
 bool GraphicsDirectX12::CreateDeviceAndSwapChain(const int width, const int height, const HWND hWnd)
 {

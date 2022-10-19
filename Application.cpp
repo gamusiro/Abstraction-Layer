@@ -16,7 +16,7 @@
 IGraphics*                  Application::m_graphics = nullptr;
 Application::USING_API_TYPE Application::m_apiType;
 
-ObjectCube g_Cube;
+ObjectCube* g_Cube;
 
 
 /* Constructor */
@@ -55,8 +55,9 @@ bool Application::Init()
 
     if (!m_graphics->Init(m_width, m_height, this->GetHandle())) 
         return false;
-
-    g_Cube.Init();
+    
+    g_Cube = new ObjectCube();
+    g_Cube->Init();
 
     return true;
 }
@@ -64,8 +65,8 @@ bool Application::Init()
 /* Uninitialize */
 void Application::Uninit()
 {
-    g_Cube.Uninit();
-
+    g_Cube->Uninit();
+    delete g_Cube;
 
     if (!m_graphics)
         return;
@@ -83,7 +84,7 @@ void Application::Draw()
 {
     m_graphics->Clear();
 
-    g_Cube.Draw();
+    g_Cube->Draw();
 
     m_graphics->Present();
 }

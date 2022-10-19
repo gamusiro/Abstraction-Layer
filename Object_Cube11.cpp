@@ -5,13 +5,9 @@
 *		Detail	:
 ===================================================================================*/
 #include "Application.h"
-#include "Graphics_DirectX11.h"
 
 #include "Object_Cube11.h"
 using namespace structure;
-
-ID3D11Buffer* ObjectCube11::m_vertexBuffer;
-ID3D11Buffer* ObjectCube11::m_indexBuffer;
 
 const Vertex3D g_sprite[]
 {

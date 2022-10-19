@@ -4,9 +4,11 @@
 *		File	: Object_Cube.cpp
 *		Detail	:
 ===================================================================================*/
+#include <DirectXMath.h>
 #include "Application.h"
-#include "Graphics_DirectX11.h"
+
 #include "Object_Cube11.h"
+#include "Object_Cube12.h"
 
 #include "Object_Cube.h"
 
@@ -21,6 +23,10 @@ ObjectCube::ObjectCube()
 	{
 	case Application::USING_API_TYPE::DIRECTX_11:
 		m_cube = new ObjectCube11();
+		break;
+	case Application::USING_API_TYPE::DIRECTX_12:
+		m_cube = new ObjectCube12();
+		break;
 	default:
 		break;
 	}

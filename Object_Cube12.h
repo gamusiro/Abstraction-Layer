@@ -5,9 +5,10 @@
 *		Detail	:
 ===================================================================================*/
 #pragma once
+#include "Graphics_DirectX12.h"
 #include "Object_Interface.h"
 
-class Object_Cube12 : public IObject
+class ObjectCube12 : public IObject
 {
 public:
 	//**************************************************
@@ -39,7 +40,8 @@ public:
 	void Draw()		override;
 
 private:
-	static ID3D12Resource*	m_vertexBuffer;
+	ID3D12Resource*	m_vertexBuffer;
+	ID3D12Resource* m_indexBuffer;
 	ID3D12DescriptorHeap*	m_worldBuffer;
 };
 

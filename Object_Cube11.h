@@ -5,6 +5,7 @@
 *		Detail	:
 ===================================================================================*/
 #pragma once
+#include "Graphics_DirectX11.h"
 #include "Object_Interface.h"
 
 class ObjectCube11 : public IObject
@@ -39,7 +40,7 @@ public:
 	void Draw()		override;
 
 private:
-	static ID3D11Buffer* m_vertexBuffer;
-	static ID3D11Buffer* m_indexBuffer;
+	ID3D11Buffer* m_vertexBuffer;
+	ID3D11Buffer* m_indexBuffer;
 };
 
