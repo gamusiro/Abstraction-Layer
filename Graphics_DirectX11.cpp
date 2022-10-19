@@ -80,6 +80,18 @@ void GraphicsDirectX11::Present()
 	m_swapChain->Present(true, NULL);
 }
 
+/* Get device pointer */
+void* GraphicsDirectX11::Device()
+{
+	return m_device;
+}
+
+/* Get context pointer */
+void* GraphicsDirectX11::Context()
+{
+	return m_context;
+}
+
 // Create device and swapchain
 bool GraphicsDirectX11::CreateDeviceAndSwapChain(const int width, const int height, const HWND hWnd)
 {

@@ -80,7 +80,15 @@ public:
 	//**************************************************
 	static IGraphics* Graphics();
 
+	//**************************************************
+	/// \brief Get api type
+	///  
+	/// \return api type
+	//**************************************************
+	static USING_API_TYPE Get();
+
 private:
-	static IGraphics* m_graphics;
+	static IGraphics*		m_graphics;
+	static USING_API_TYPE	m_apiType;
 };
 

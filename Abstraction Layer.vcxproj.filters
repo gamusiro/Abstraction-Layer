@@ -12,6 +12,15 @@
     <ClCompile Include="Graphics_DirectX12.cpp">
       <Filter>Graphics\DirectX\12</Filter>
     </ClCompile>
+    <ClCompile Include="Object_Cube.cpp">
+      <Filter>Object\Cube</Filter>
+    </ClCompile>
+    <ClCompile Include="Object_Cube11.cpp">
+      <Filter>Object\Cube\11</Filter>
+    </ClCompile>
+    <ClCompile Include="Object_Cube12.cpp">
+      <Filter>Object\Cube\12</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -33,6 +42,18 @@
     <ClInclude Include="Graphics_DirectX12.h">
       <Filter>Graphics\DirectX\12</Filter>
     </ClInclude>
+    <ClInclude Include="Object_Cube.h">
+      <Filter>Object\Cube</Filter>
+    </ClInclude>
+    <ClInclude Include="Object_Interface.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Object_Cube11.h">
+      <Filter>Object\Cube\11</Filter>
+    </ClInclude>
+    <ClInclude Include="Object_Cube12.h">
+      <Filter>Object\Cube\12</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Window">
@@ -49,6 +70,18 @@
     </Filter>
     <Filter Include="Graphics\DirectX\12">
       <UniqueIdentifier>{a4779d6a-52b9-44b2-a8d5-d598a5fbf98d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{7a6a42f8-9de5-4ad6-8c04-2089f30da74f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Cube">
+      <UniqueIdentifier>{044ec990-f85e-423d-9996-bf63a1db8904}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Cube\11">
+      <UniqueIdentifier>{75ea7644-ade4-4281-b09c-c3fe04c235d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Cube\12">
+      <UniqueIdentifier>{ec944514-50dd-457b-9a8a-35bc14274d98}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

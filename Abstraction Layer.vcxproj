@@ -143,6 +143,9 @@
     <ClCompile Include="Graphics_DirectX12.cpp" />
     <ClCompile Include="Graphics_DirectX11.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Object_Cube.cpp" />
+    <ClCompile Include="Object_Cube11.cpp" />
+    <ClCompile Include="Object_Cube12.cpp" />
     <ClCompile Include="Window_Desktop.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +153,10 @@
     <ClInclude Include="Graphics_DirectX12.h" />
     <ClInclude Include="Graphics_DirectX11.h" />
     <ClInclude Include="Graphics_Interface.h" />
+    <ClInclude Include="Object_Cube.h" />
+    <ClInclude Include="Object_Cube11.h" />
+    <ClInclude Include="Object_Cube12.h" />
+    <ClInclude Include="Object_Interface.h" />
     <ClInclude Include="Window_Desktop.h" />
     <ClInclude Include="Window_Desktop_Procedure.h" />
     <ClInclude Include="Window_Interface.h" />
