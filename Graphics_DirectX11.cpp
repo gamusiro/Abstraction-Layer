@@ -135,6 +135,36 @@ int GraphicsDirectX11::CreateVertexBufferAndIndexBuffer(
 	return retIndex;
 }
 
+/* Send world matrix to vertex shader */
+void GraphicsDirectX11::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const DirectX::XMFLOAT3 rot3, const DirectX::XMFLOAT3 scl3)
+{
+	XMMATRIX trl, rot, scl, world;
+	trl		= XMMatrixTranslationFromVector(XMLoadFloat3(&pos3));
+	rot		= XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&rot3));
+	scl		= XMMatrixScalingFromVector(XMLoadFloat3(&scl3));
+	world	= XMMatrixTranspose(scl * rot * trl);
+
+	m_context->UpdateSubresource(m_modelMatrix, 0, nullptr, &world, 0, 0);
+}
+
+/* Send view matrix to vertex shader */
+void GraphicsDirectX11::SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up)
+{
+	XMMATRIX view = XMMatrixLookAtLH(XMLoadFloat3(&pos), XMLoadFloat3(&target), XMLoadFloat3(&up));
+	view = XMMatrixTranspose(view);
+
+	m_context->UpdateSubresource(m_viewMatrix, 0, nullptr, &view, 0, 0);
+}
+
+/* Send projection matrix to vertex shader */
+void GraphicsDirectX11::SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ)
+{
+	XMMATRIX projection = XMMatrixPerspectiveFovLH(fov, aspect, nearZ, farZ);
+	projection = XMMatrixTranspose(projection);
+
+	m_context->UpdateSubresource(m_projectionMatrix, 0, nullptr, &projection, 0, 0);
+}
+
 /* Draw call */
 void GraphicsDirectX11::DrawIndex(int index)
 {

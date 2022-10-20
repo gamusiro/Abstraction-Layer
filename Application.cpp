@@ -10,13 +10,12 @@
 #include "Graphics_DirectX11.h"
 #include "Graphics_DirectX12.h"
 
+#include "Camera.h"
 #include "Object_Cube.h"
 
 /* graphics class instance */
 IGraphics*                  Application::m_graphics = nullptr;
 Application::USING_API_TYPE Application::m_apiType;
-
-ObjectCube* g_Cube;
 
 
 /* Constructor */
@@ -29,7 +28,6 @@ Application::Application(const int width, const int height, const void* hInstanc
 /* Destructor */
 Application::~Application()
 {
-    delete m_graphics;
 }
 
 
@@ -56,8 +54,16 @@ bool Application::Init()
     if (!m_graphics->Init(m_width, m_height, this->GetHandle())) 
         return false;
     
-    g_Cube = new ObjectCube();
-    g_Cube->Init();
+    m_camera = new ObjectCamera();
+    m_camera->Init(m_width, m_height);
+
+    m_cubes.resize(5);
+    for (size_t i = 0; i < m_cubes.size(); ++i)
+    {
+        m_cubes[i] = new ObjectCube();
+        m_cubes[i]->Init();
+        m_cubes[i]->SetPosition({ -4.0f + 3.0f * float(i), 0, 0 });
+    }
 
     return true;
 }
@@ -65,13 +71,20 @@ bool Application::Init()
 /* Uninitialize */
 void Application::Uninit()
 {
-    g_Cube->Uninit();
-    delete g_Cube;
+    for (size_t i = 0; i < m_cubes.size(); ++i)
+    {
+        m_cubes[i]->Uninit();
+        delete m_cubes[i];
+    }
+
+    m_camera->Uninit();
+    delete m_camera;
 
     if (!m_graphics)
         return;
 
     m_graphics->Uninit();
+    delete m_graphics;
 }
 
 /* Update */
@@ -83,8 +96,12 @@ void Application::Upadte()
 void Application::Draw()
 {
     m_graphics->Clear();
+    m_camera->Set3D();
 
-    g_Cube->Draw();
+    for (size_t i = 0; i < m_cubes.size(); ++i)
+    {
+        m_cubes[i]->Draw();
+    }
 
     m_graphics->Present();
 }

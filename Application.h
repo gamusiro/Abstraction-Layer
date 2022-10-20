@@ -5,11 +5,14 @@
 *		Detail	:
 ===================================================================================*/
 #pragma once
+#include <vector>
 
 /*  Application class  */
 #include "Window_Desktop.h"
 
 class IGraphics;
+class ObjectCamera;
+class ObjectCube;
 
 class Application : public WindowDesktop
 {
@@ -90,5 +93,8 @@ public:
 private:
 	static IGraphics*		m_graphics;
 	static USING_API_TYPE	m_apiType;
+
+	ObjectCamera*				m_camera;
+	std::vector<ObjectCube*>	m_cubes;
 };
 

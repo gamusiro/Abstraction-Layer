@@ -10,6 +10,7 @@
 
 #include "Graphics_DirectX12.h"
 using namespace structure;
+using namespace DirectX;
 
 //**************************************************
 /// \brief These are roots index for send to shader
@@ -231,6 +232,92 @@ int GraphicsDirectX12::CreateVertexBufferAndIndexBuffer(
 	m_indexBuffers.push_back({ indexBuffer, iDataNum });
 
 	return retIndex;
+}
+
+/* Create descriptor heap for matrix buffer */
+int GraphicsDirectX12::CreateMatrixBuffer()
+{
+	int retIndex = m_constantBuffers.size();
+
+	HRESULT ret{};
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type					= D3D12_HEAP_TYPE::D3D12_HEAP_TYPE_UPLOAD;
+	heapProperties.CPUPageProperty		= D3D12_CPU_PAGE_PROPERTY::D3D12_CPU_PAGE_PROPERTY_UNKNOWN; 
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL::D3D12_MEMORY_POOL_UNKNOWN;				
+
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Dimension			= D3D12_RESOURCE_DIMENSION::D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width				= (sizeof(XMMATRIX) + 0xff) & ~0xff;
+	resourceDesc.Height				= 1;
+	resourceDesc.DepthOrArraySize	= 1;
+	resourceDesc.MipLevels			= 1;
+	resourceDesc.Format				= DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
+	resourceDesc.SampleDesc.Count	= 1;
+	resourceDesc.Flags				= D3D12_RESOURCE_FLAGS::D3D12_RESOURCE_FLAG_NONE;
+	resourceDesc.Layout				= D3D12_TEXTURE_LAYOUT::D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	// Create constant buffer
+	ID3D12Resource* constantBuffer;
+	ret = m_device->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAGS::D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		__uuidof(ID3D12Resource),
+		(void**)&constantBuffer
+	);
+	if (FAILED(ret))
+		return -1;
+
+	m_constantBuffers.push_back(constantBuffer);
+
+	return retIndex;
+}
+
+/* Send world matrix to vertex shader */
+void GraphicsDirectX12::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const DirectX::XMFLOAT3 rot3, const DirectX::XMFLOAT3 scl3)
+{
+	XMMATRIX trl, rot, scl, world;
+	trl		= XMMatrixTranslationFromVector(XMLoadFloat3(&pos3));
+	rot		= XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&rot3));
+	scl		= XMMatrixScalingFromVector(XMLoadFloat3(&scl3));
+	world	= XMMatrixTranspose(scl * rot * trl);
+
+	XMMATRIX* mat{};
+	m_constantBuffers[id]->Map(0, nullptr, (void**)&mat);
+	*mat = world;
+	m_constantBuffers[id]->Unmap(0, nullptr);
+
+	m_commandList->SetGraphicsRootConstantBufferView(CONSTANT_BUFFER_INDEX::WORLD_MATRIX, m_constantBuffers[id]->GetGPUVirtualAddress());
+}
+
+/* Send view matrix to vertex shader */
+void GraphicsDirectX12::SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up)
+{
+	XMMATRIX view = XMMatrixLookAtLH(XMLoadFloat3(&pos), XMLoadFloat3(&target), XMLoadFloat3(&up));
+	view = XMMatrixTranspose(view);
+
+	XMMATRIX* mat{};
+	m_constantBuffers[id]->Map(0, nullptr, (void**)&mat);
+	*mat = view;
+	m_constantBuffers[id]->Unmap(0, nullptr);
+
+	m_commandList->SetGraphicsRootConstantBufferView(CONSTANT_BUFFER_INDEX::VIEW_MATRIX, m_constantBuffers[id]->GetGPUVirtualAddress());
+}
+
+/* Send projection matrix to vertex shader */
+void GraphicsDirectX12::SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ)
+{
+	XMMATRIX projection = XMMatrixPerspectiveFovLH(fov, aspect, nearZ, farZ);
+	projection = XMMatrixTranspose(projection);
+
+	XMMATRIX* mat{};
+	m_constantBuffers[id]->Map(0, nullptr, (void**)&mat);
+	*mat = projection;
+	m_constantBuffers[id]->Unmap(0, nullptr);
+
+	m_commandList->SetGraphicsRootConstantBufferView(CONSTANT_BUFFER_INDEX::PROJECTION_MATRIX, m_constantBuffers[id]->GetGPUVirtualAddress());
 }
 
 /* Draw call */

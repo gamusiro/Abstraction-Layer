@@ -39,8 +39,6 @@ public:
 	void Draw()		override;
 
 private:
-	DirectX::XMFLOAT3	m_position;
-	DirectX::XMFLOAT3	m_rotate;
-	DirectX::XMFLOAT3	m_scale;
+	static int			m_id;
 };
 

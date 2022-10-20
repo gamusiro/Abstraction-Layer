@@ -44,11 +44,68 @@ public:
 	//**************************************************
 	/// \brief Create buffer
 	/// 
+	/// \param[in] vData	-> model vertex data
+	/// \param[in] vDataNum	-> count vertex
+	/// \param[in] iData	-> model index data
+	/// \param[in] iDataNum	-> count index
+	/// 
 	/// \return control id
 	//**************************************************
 	int CreateVertexBufferAndIndexBuffer(
-		const structure::Vertex3D* vData, size_t vDataSize,
-		const unsigned int* iData, size_t iDataSize
+		const structure::Vertex3D* vData,
+		size_t vDataNum,
+		const unsigned int* iData,
+		size_t iDataNum
+	) override;
+
+	//**************************************************
+	/// \brief Set world matrix
+	/// 
+	/// \param[in] pos -> position of model in 3d space
+	/// \param[in] rot -> angle of model 
+	/// \param[in] pos -> scale of model
+	/// 
+	/// \return none
+	//**************************************************
+	void SetWorldMatrix(
+		int id,
+		const DirectX::XMFLOAT3 pos,
+		const DirectX::XMFLOAT3 rot,
+		const DirectX::XMFLOAT3 scl
+	) override;
+
+	//**************************************************
+	/// \brief Set view matrix
+	/// 
+	/// \param[in] pos		-> position of camera in 3d space
+	/// \param[in] target	-> position of focus in 3d space 
+	/// \param[in] up		-> up
+	/// 
+	/// \return none
+	//**************************************************
+	void SetViewMatrix(
+		int id,
+		const DirectX::XMFLOAT3 pos,
+		const DirectX::XMFLOAT3 target,
+		const DirectX::XMFLOAT3 up
+	) override;
+
+	//**************************************************
+	/// \brief Set view matrix
+	/// 
+	/// \param[in] fov
+	/// \param[in] aspect
+	/// \param[in] nearZ
+	/// \param[in] farZ
+	/// 
+	/// \return none
+	//**************************************************
+	void SetProjectionMatrix(
+		int id,
+		float fov,
+		float aspect,
+		float nearZ,
+		float farZ
 	) override;
 
 	//**************************************************
@@ -58,7 +115,7 @@ public:
 	/// 
 	/// \return none
 	//**************************************************
-	void DrawIndex(int index) override;
+	void DrawIndex(int id) override;
 
 private:
 	//**************************************************

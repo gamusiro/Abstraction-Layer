@@ -33,20 +33,5 @@ int __stdcall WinMain(
 		app.Uninit();
 	}
 
-	{
-		Application app(1280, 780, hInstance, Application::USING_API_TYPE::DIRECTX_12);
-
-		if (app.Init())
-		{
-			while (!app.Close())
-			{
-				app.Upadte();
-				app.Draw();
-			}
-		}
-
-		app.Uninit();
-	}
-
 	return 0;
 }

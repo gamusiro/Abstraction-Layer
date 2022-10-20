@@ -38,8 +38,7 @@ PS_INPUT vsmain(VS_INPUT input)
     matrix viewProjection   = mul(view, projection);
     
     /* These params send to pixel shader*/
-    //output.Position         = mul(worldPosition, viewProjection);
-    output.Position         = input.Position;
+    output.Position         = mul(worldPosition, viewProjection);
     output.Normal           = input.Normal;
     output.TexCoord         = input.TexCoord;
     

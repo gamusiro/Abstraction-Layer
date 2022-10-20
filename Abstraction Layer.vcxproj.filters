@@ -15,6 +15,9 @@
     <ClCompile Include="Graphics_DirectX12.cpp">
       <Filter>Graphics\DirectX\12</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Camera</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -42,6 +45,9 @@
     <ClInclude Include="Graphics_DirectX12.h">
       <Filter>Graphics\DirectX\12</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Window">
@@ -64,6 +70,9 @@
     </Filter>
     <Filter Include="Object\Cube">
       <UniqueIdentifier>{044ec990-f85e-423d-9996-bf63a1db8904}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Camera">
+      <UniqueIdentifier>{162da9d1-3915-45c0-906a-47f42af99efc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

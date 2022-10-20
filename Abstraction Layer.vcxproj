@@ -143,6 +143,7 @@
     <ClCompile Include="Graphics_DirectX11.cpp" />
     <ClCompile Include="Graphics_DirectX12.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Object_Cube.cpp" />
     <ClCompile Include="Window_Desktop.cpp" />
   </ItemGroup>
@@ -151,6 +152,7 @@
     <ClInclude Include="Graphics_DirectX11.h" />
     <ClInclude Include="Graphics_DirectX12.h" />
     <ClInclude Include="Graphics_Interface.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Object_Cube.h" />
     <ClInclude Include="Object_Interface.h" />
     <ClInclude Include="Window_Desktop.h" />
