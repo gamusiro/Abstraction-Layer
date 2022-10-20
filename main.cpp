@@ -18,18 +18,35 @@ int __stdcall WinMain(
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	UNREFERENCED_PARAMETER(nCmdShow);
 
-	Application app(1280, 780, hInstance, Application::USING_API_TYPE::DIRECTX_12);
-
-	if (app.Init())
 	{
-		while (!app.Close())
+		Application app(1280, 780, hInstance, Application::USING_API_TYPE::DIRECTX_11);
+
+		if (app.Init())
 		{
-			app.Upadte();
-			app.Draw();
+			while (!app.Close())
+			{
+				app.Upadte();
+				app.Draw();
+			}
 		}
+
+		app.Uninit();
 	}
 
-	app.Uninit();
+	{
+		Application app(1280, 780, hInstance, Application::USING_API_TYPE::DIRECTX_12);
+
+		if (app.Init())
+		{
+			while (!app.Close())
+			{
+				app.Upadte();
+				app.Draw();
+			}
+		}
+
+		app.Uninit();
+	}
 
 	return 0;
 }

@@ -6,6 +6,7 @@
 ===================================================================================*/
 #pragma once
 #include <DirectXMath.h>
+#include <vector>
 
 namespace structure
 {
@@ -35,6 +36,8 @@ public:
 	virtual void	Uninit()									= 0;
 	virtual void	Clear()										= 0;
 	virtual void	Present()									= 0;
-	virtual void*	Device()  { return nullptr; }
-	virtual void*	Context() { return nullptr; }
+	virtual int		CreateVertexBufferAndIndexBuffer(
+		const structure::Vertex3D* vData, size_t vDataSize,
+		const unsigned int* iData, size_t iDataSize)			= 0;
+	virtual void	DrawIndex(int index)						= 0;
 };

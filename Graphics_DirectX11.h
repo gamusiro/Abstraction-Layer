@@ -42,18 +42,23 @@ public:
 	void Present() override;
 
 	//**************************************************
-	/// \brief Get device pointer
+	/// \brief Create buffer
 	/// 
-	/// \return device pointer
+	/// \return control id
 	//**************************************************
-	void* Device() override;
+	int CreateVertexBufferAndIndexBuffer(
+		const structure::Vertex3D* vData, size_t vDataSize,
+		const unsigned int* iData, size_t iDataSize
+	) override;
 
 	//**************************************************
-	/// \brief Get context pointer
+	/// \brief Set vertex buffer and index buffer
 	/// 
-	/// \return context pointer
+	/// \param[in] control id
+	/// 
+	/// \return none
 	//**************************************************
-	void* Context() override;
+	void DrawIndex(int index) override;
 
 private:
 	//**************************************************
@@ -162,4 +167,14 @@ private:
 	ID3D11InputLayout*			m_inputLayout;			// Vertex layout Interface
 	ID3D11VertexShader*			m_vertexShader;			// Vertex shader Interface
 	ID3D11PixelShader*			m_pixelShader;			// Pixel shader Interface
+
+	struct IndexInfo
+	{
+		ID3D11Buffer* buffer;
+		unsigned int indexNum;
+	};
+
+	std::vector<ID3D11Buffer*>	m_vertexBuffers;
+	std::vector<IndexInfo>		m_indexBuffers;
+
 };

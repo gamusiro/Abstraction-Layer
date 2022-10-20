@@ -7,25 +7,9 @@
 #pragma once
 #include "Object_Interface.h"
 
-class ICube;
-
 class ObjectCube : public IObject
 {
 public:
-	//**************************************************
-	/// \brief Constructor
-	/// 
-	/// \return none
-	//**************************************************
-	ObjectCube();
-	
-	//**************************************************
-	/// \brief Destructor
-	/// 
-	/// \return none
-	//**************************************************
-	~ObjectCube();
-
 	//**************************************************
 	/// \brief Initialize cube
 	/// 
@@ -55,7 +39,6 @@ public:
 	void Draw()		override;
 
 private:
-	IObject*			m_cube;
 	DirectX::XMFLOAT3	m_position;
 	DirectX::XMFLOAT3	m_rotate;
 	DirectX::XMFLOAT3	m_scale;

@@ -9,6 +9,7 @@
 
 #include "Graphics_DirectX11.h"
 using namespace DirectX;
+using namespace structure;
 
 /* Initialize */
 bool GraphicsDirectX11::Init(int width, int height, void* handle)
@@ -48,6 +49,16 @@ bool GraphicsDirectX11::Init(int width, int height, void* handle)
 /* Uninitialize */
 void GraphicsDirectX11::Uninit()
 {
+	for (size_t i = 0; i < m_vertexBuffers.size(); ++i)
+	{
+		SAFE_RELEASE(m_vertexBuffers[i]);
+	}
+
+	for (size_t i = 0; i < m_indexBuffers.size(); ++i)
+	{
+		SAFE_RELEASE(m_indexBuffers[i].buffer);
+	}
+
 	SAFE_RELEASE(m_projectionMatrix);
 	SAFE_RELEASE(m_viewMatrix);
 	SAFE_RELEASE(m_modelMatrix);
@@ -80,16 +91,60 @@ void GraphicsDirectX11::Present()
 	m_swapChain->Present(true, NULL);
 }
 
-/* Get device pointer */
-void* GraphicsDirectX11::Device()
+/* Creats vertex buffer and index buffer */
+int GraphicsDirectX11::CreateVertexBufferAndIndexBuffer(
+	const structure::Vertex3D* vData, size_t vDataNum,
+	const unsigned int* iData, size_t iDataNum
+)
 {
-	return m_device;
+	int retIndex = int(m_vertexBuffers.size());
+
+	HRESULT ret{};
+	{// Create vertex buffer
+		ID3D11Buffer* vertexBuffer;
+		D3D11_BUFFER_DESC bufferDesc{};
+		bufferDesc.ByteWidth = sizeof(Vertex3D) * vDataNum;
+		bufferDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
+		bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA subResource{};
+		subResource.pSysMem = vData;
+		ret = m_device->CreateBuffer(&bufferDesc, &subResource, &vertexBuffer);
+		if (FAILED(ret))
+			return -1;
+
+		m_vertexBuffers.push_back(vertexBuffer);
+	}
+
+	{// Create Index buffer
+		ID3D11Buffer* indexBuffer;
+		D3D11_BUFFER_DESC bufferDesc{};
+		bufferDesc.ByteWidth	= sizeof(unsigned int) * iDataNum;
+		bufferDesc.Usage		= D3D11_USAGE::D3D11_USAGE_DEFAULT;
+		bufferDesc.BindFlags	= D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER;
+
+		D3D11_SUBRESOURCE_DATA subResource{};
+		subResource.pSysMem = iData;
+		ret = m_device->CreateBuffer(&bufferDesc, &subResource, &indexBuffer);
+		if (FAILED(ret))
+			return -2;
+
+		m_indexBuffers.push_back({ indexBuffer, iDataNum });
+	}
+
+	return retIndex;
 }
 
-/* Get context pointer */
-void* GraphicsDirectX11::Context()
+/* Draw call */
+void GraphicsDirectX11::DrawIndex(int index)
 {
-	return m_context;
+	UINT stride = sizeof(Vertex3D);
+	UINT offset = 0;
+	m_context->IASetVertexBuffers(0, 1, &m_vertexBuffers[index], &stride, &offset);
+	m_context->IASetIndexBuffer(m_indexBuffers[index].buffer, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+
+	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_context->DrawIndexed(m_indexBuffers[index].indexNum, 0, 0);
 }
 
 // Create device and swapchain

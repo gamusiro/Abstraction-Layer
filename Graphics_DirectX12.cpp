@@ -9,6 +9,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 #include "Graphics_DirectX12.h"
+using namespace structure;
 
 //**************************************************
 /// \brief These are roots index for send to shader
@@ -50,6 +51,16 @@ bool GraphicsDirectX12::Init(int width, int height, void* handle)
 /* Uninitialize */
 void GraphicsDirectX12::Uninit()
 {
+	for (size_t i = 0; i < m_vertexBuffers.size(); ++i)
+	{
+		SAFE_RELEASE(m_vertexBuffers[i]);
+	}
+
+	for (size_t i = 0; i < m_indexBuffers.size(); ++i)
+	{
+		SAFE_RELEASE(m_indexBuffers[i].buffer);
+	}
+
 	SAFE_RELEASE(m_pipelineState);
 	SAFE_RELEASE(m_rootSignature);
 	SAFE_RELEASE(m_fence);
@@ -145,16 +156,100 @@ void GraphicsDirectX12::Present()
 	m_swapChain->Present(1, 0);
 }
 
-/* Get device pointer */
-void* GraphicsDirectX12::Device()
+/* Creats vertex buffer and index buffer */
+int GraphicsDirectX12::CreateVertexBufferAndIndexBuffer(
+	const structure::Vertex3D* vData, size_t vDataNum,
+	const unsigned int* iData, size_t iDataNum
+)
 {
-	return m_device;
+	int retIndex = m_vertexBuffers.size();
+
+	HRESULT ret{};
+	D3D12_HEAP_PROPERTIES heapProperties{};
+	heapProperties.Type					= D3D12_HEAP_TYPE::D3D12_HEAP_TYPE_UPLOAD;
+	heapProperties.CPUPageProperty		= D3D12_CPU_PAGE_PROPERTY::D3D12_CPU_PAGE_PROPERTY_UNKNOWN; 
+	heapProperties.MemoryPoolPreference = D3D12_MEMORY_POOL::D3D12_MEMORY_POOL_UNKNOWN;				
+
+	D3D12_RESOURCE_DESC resourceDesc{};
+	resourceDesc.Dimension			= D3D12_RESOURCE_DIMENSION::D3D12_RESOURCE_DIMENSION_BUFFER;
+	resourceDesc.Width				= sizeof(Vertex3D) * vDataNum;
+	resourceDesc.Height				= 1;
+	resourceDesc.DepthOrArraySize	= 1;
+	resourceDesc.MipLevels			= 1;
+	resourceDesc.Format				= DXGI_FORMAT::DXGI_FORMAT_UNKNOWN;
+	resourceDesc.SampleDesc.Count	= 1;
+	resourceDesc.Flags				= D3D12_RESOURCE_FLAGS::D3D12_RESOURCE_FLAG_NONE;
+	resourceDesc.Layout				= D3D12_TEXTURE_LAYOUT::D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+
+	// Create vertex buffer
+	ID3D12Resource* vertexBuffer;
+	ret = m_device->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAGS::D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		__uuidof(ID3D12Resource),
+		(void**)&vertexBuffer
+	);
+	if (FAILED(ret))
+		return -1;
+
+	Vertex3D* vertexMap;
+	ret = vertexBuffer->Map(0, nullptr, (void**)&vertexMap);
+	if (FAILED(ret))
+		return -1;
+
+	memcpy(vertexMap, vData, sizeof(Vertex3D) * vDataNum);
+	vertexBuffer->Unmap(0, nullptr);
+	
+	m_vertexBuffers.push_back(vertexBuffer);
+
+	// Create index buffer
+	ID3D12Resource* indexBuffer;
+	resourceDesc.Width	= sizeof(unsigned int) * iDataNum;
+	ret = m_device->CreateCommittedResource(
+		&heapProperties,
+		D3D12_HEAP_FLAGS::D3D12_HEAP_FLAG_NONE,
+		&resourceDesc,
+		D3D12_RESOURCE_STATES::D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		__uuidof(ID3D12Resource),
+		(void**)&indexBuffer
+	);
+	if (FAILED(ret))
+		return -1;
+
+	unsigned int* indexMap;
+	ret = indexBuffer->Map(0, nullptr, (void**)&indexMap);
+	if (FAILED(ret))
+		return -1;
+
+	memcpy(indexMap, iData, sizeof(unsigned int) * iDataNum);
+	indexBuffer->Unmap(0, nullptr);
+
+	m_indexBuffers.push_back({ indexBuffer, iDataNum });
+
+	return retIndex;
 }
 
-/* Get context pointer */
-void* GraphicsDirectX12::Context()
+/* Draw call */
+void GraphicsDirectX12::DrawIndex(int index)
 {
-	return m_commandList;
+	D3D12_VERTEX_BUFFER_VIEW vView{};
+	vView.BufferLocation	= m_vertexBuffers[index]->GetGPUVirtualAddress();
+	vView.SizeInBytes		= UINT(m_vertexBuffers[index]->GetDesc().Width);
+	vView.StrideInBytes		= sizeof(Vertex3D);
+
+	D3D12_INDEX_BUFFER_VIEW iView{};
+	iView.BufferLocation	= m_indexBuffers[index].buffer->GetGPUVirtualAddress();
+	iView.SizeInBytes		= UINT(m_indexBuffers[index].buffer->GetDesc().Width);
+	iView.Format			= DXGI_FORMAT::DXGI_FORMAT_R32_UINT;
+	
+	m_commandList->IASetVertexBuffers(0, 1, &vView);
+	m_commandList->IASetIndexBuffer(&iView);
+	m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	m_commandList->DrawIndexedInstanced(m_indexBuffers[index].indexNum, 1, 0, 0, 0);
 }
 
 // Create device and swapchain

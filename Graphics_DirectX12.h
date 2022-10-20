@@ -45,18 +45,23 @@ class GraphicsDirectX12 : public IGraphics
 	void Present() override;
 
 	//**************************************************
-	/// \brief Get device pointer
+	/// \brief Create buffer
 	/// 
-	/// \return device pointer
+	/// \return control id
 	//**************************************************
-	void* Device() override;
+	int CreateVertexBufferAndIndexBuffer(
+		const structure::Vertex3D* vData, size_t vDataNum,
+		const unsigned int* iData, size_t iDataNum
+	) override;
 
 	//**************************************************
-	/// \brief Get context pointer
+	/// \brief Set vertex buffer and index buffer
 	/// 
-	/// \return context pointer
+	/// \param[in] control id
+	/// 
+	/// \return none
 	//**************************************************
-	void* Context() override;
+	void DrawIndex(int index) override;
 
 private:
 	//**************************************************
@@ -158,5 +163,14 @@ private:
 	ID3D12PipelineState*		m_pipelineState;
 	D3D12_VIEWPORT				m_viewport{};
 	D3D12_RECT					m_scissorRect{};
+
+	struct IndexInfo
+	{
+		ID3D12Resource*			buffer;
+		unsigned int			indexNum;
+	};
+
+	std::vector<ID3D12Resource*>	m_vertexBuffers;
+	std::vector<IndexInfo>			m_indexBuffers;
 };
 
