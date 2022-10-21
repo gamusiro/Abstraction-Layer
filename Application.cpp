@@ -9,6 +9,7 @@
 
 #include "Graphics_DirectX11.h"
 #include "Graphics_DirectX12.h"
+#include "Graphics_Vulkan.h"
 
 #include "Camera.h"
 #include "Object_Cube.h"
@@ -44,8 +45,11 @@ bool Application::Init()
         break;
     case Application::USING_API_TYPE::OPENGL:
         break;
-    default:
+    case Application::USING_API_TYPE::VULKAN:
+        m_graphics = new GraphicsVulkan();
         break;
+    default:
+        return false;
     }
 
     if (!m_graphics) 

@@ -18,6 +18,9 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics_Vulkan.cpp">
+      <Filter>Graphics\Vulkan</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -48,6 +51,9 @@
     <ClInclude Include="Camera.h">
       <Filter>Camera</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics_Vulkan.h">
+      <Filter>Graphics\Vulkan</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Window">
@@ -73,6 +79,9 @@
     </Filter>
     <Filter Include="Camera">
       <UniqueIdentifier>{162da9d1-3915-45c0-906a-47f42af99efc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Vulkan">
+      <UniqueIdentifier>{d6f71fc9-cbdc-4c88-bfbe-0c4ba9bee94a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

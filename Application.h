@@ -22,6 +22,7 @@ public:
 		DIRECTX_11,
 		DIRECTX_12,
 		OPENGL,
+		VULKAN
 	};
 
 public:

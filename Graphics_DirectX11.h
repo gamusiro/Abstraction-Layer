@@ -227,8 +227,8 @@ private:
 
 	struct IndexInfo
 	{
-		ID3D11Buffer* buffer;
-		unsigned int indexNum;
+		ID3D11Buffer*	buffer;
+		size_t			indexNum;
 	};
 
 	std::vector<ID3D11Buffer*>	m_vertexBuffers;
