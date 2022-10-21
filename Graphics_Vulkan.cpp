@@ -13,33 +13,33 @@
 
 using namespace std;
 
-//static VkBool32 VKAPI_CALL DebugReportCallback(
-//	VkDebugReportFlagsEXT flags,
-//	VkDebugReportObjectTypeEXT objactTypes,
-//	uint64_t object,
-//	size_t    location,
-//	int32_t messageCode,
-//	const char* pLayerPrefix,
-//	const char* pMessage,
-//	void* pUserData)
-//{
-//	VkBool32 ret = VK_FALSE;
-//	if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT ||
-//		flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)
-//	{
-//		ret = VK_TRUE;
-//	}
-//	std::stringstream ss;
-//	if (pLayerPrefix)
-//	{
-//		ss << "[" << pLayerPrefix << "] ";
-//	}
-//	ss << pMessage << std::endl;
-//
-//	OutputDebugStringA(ss.str().c_str());
-//
-//	return ret;
-//}
+static VkBool32 VKAPI_CALL DebugReportCallback(
+	VkDebugReportFlagsEXT flags,
+	VkDebugReportObjectTypeEXT objactTypes,
+	uint64_t object,
+	size_t    location,
+	int32_t messageCode,
+	const char* pLayerPrefix,
+	const char* pMessage,
+	void* pUserData)
+{
+	VkBool32 ret = VK_FALSE;
+	if (flags & VK_DEBUG_REPORT_INFORMATION_BIT_EXT ||
+		flags & VK_DEBUG_REPORT_DEBUG_BIT_EXT)
+	{
+		ret = VK_TRUE;
+	}
+	std::stringstream ss;
+	if (pLayerPrefix)
+	{
+		ss << "[" << pLayerPrefix << "] ";
+	}
+	ss << pMessage << std::endl;
+
+	OutputDebugStringA(ss.str().c_str());
+
+	return ret;
+}
 
 /* Initialize */
 bool GraphicsVulkan::Init(int width, int height, void* handle)
@@ -491,8 +491,8 @@ bool GraphicsVulkan::CreateRenderPass()
 	createInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 
 	std::array<VkAttachmentDescription, 2> attachments;
-	VkAttachmentDescription colorTarget = attachments[0];
-	VkAttachmentDescription depthTarget = attachments[1];
+	VkAttachmentDescription& colorTarget = attachments[0];
+	VkAttachmentDescription& depthTarget = attachments[1];
 
 	colorTarget = {};
 	colorTarget.format			= m_surfaceFormat.format;
