@@ -5,12 +5,13 @@
 *		Detail	:
 ===================================================================================*/
 #pragma once
+#include <vector>
+#include <array>
 
 #define NOMINMAX
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vk_layer.h>
 #include <vulkan/vulkan_win32.h>
-#include <vector>
 #pragma comment(lib, "vulkan-1.lib")
 
 
@@ -38,6 +39,14 @@ private:
 	bool CreateSurface(HWND hWnd);
 	bool SelectSurfaceFormat();
 	bool CreateSwapchain(const int width, const int height);
+	bool CreateDepthBuffer();
+	bool CreateRenderPass();
+	bool CreateFrameBuffer();
+	bool CreateFence();
+	bool CreateSemaphores();
+
+
+	uint32_t getMemoryTypeIndex(uint32_t requestBits, VkMemoryPropertyFlagBits requestProperty) const;
 
 private:
 	VkInstance							m_instance;				// Vulakn instance
@@ -52,5 +61,18 @@ private:
 	VkSurfaceFormatKHR					m_surfaceFormat;		// Vulakn surface format
 	VkSwapchainKHR						m_swapchain;			// Vulkan swapchain
 	VkExtent2D							m_swapchainExtent;		// Vulkan swapchain extent
+	std::vector<VkImage>				m_swapchainImages;		// Vulkan swapchain images
+	std::vector<VkImageView>			m_swapchainViews;		// Vulkan swapchain image views
+	VkImage								m_depthBuffer;			// Vulkan depth buffer
+	VkDeviceMemory						m_depthBufferMemory;	// Vulkan depth buffer memory
+	VkImageView							m_depthBufferView;		// Vulkan depth buffer view
+	VkRenderPass						m_renderPass;			// Vulkan render pass
+	std::vector<VkFramebuffer>			m_frameBuffers;			// Vulkan frame buffers
+	std::vector<VkFence>				m_fences;				// Vulkan fence
+	VkSemaphore							m_renderSem;			// Vulakn Catch the event of render completed
+	VkSemaphore							m_presentSem;			// Vulakn Catch the event of present completed
+	std::vector<VkCommandBuffer>		m_commands;				// Vulkan command buffers
+
+	uint32_t							m_imageIndex;			// Vulkan currently frame index of swapchain
 };
 
