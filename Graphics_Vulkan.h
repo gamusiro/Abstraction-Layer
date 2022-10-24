@@ -22,13 +22,20 @@
 
 class GraphicsVulkan : public IGraphics
 {
+private:
+	struct BufferObject
+	{
+		VkBuffer		buffer;
+		VkDeviceMemory	memory;
+	};
+
 public:
 	bool Init(int width, int height, void* handle);
 	void Uninit();
 	void Clear();
 	void Present();
 	int	 CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* vData, size_t vDataSize, const unsigned int* iData, size_t iDataSize);
-	// int	 CreateMatrixBuffer();
+	int	 CreateMatrixBuffer(int registerIndex = 0) override;
 	void SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 rot, const DirectX::XMFLOAT3 scl);
 	void SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up);
 	void SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ);
@@ -47,9 +54,12 @@ private:
 	bool CreateFrameBuffer();
 	bool CreateFence();
 	bool CreateSemaphores();
+	bool CreatePipeline();
 
+	BufferObject					CreateBuffer(uint32_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+	VkPipelineShaderStageCreateInfo LoadShaderModule(const char* fileName, VkShaderStageFlagBits stage);
 
-	uint32_t getMemoryTypeIndex(uint32_t requestBits, VkMemoryPropertyFlagBits requestProperty) const;
+	uint32_t getMemoryTypeIndex(uint32_t requestBits, VkMemoryPropertyFlags requestProperty) const;
 
 private:
 	VkInstance							m_instance;				// Vulakn instance
@@ -77,5 +87,12 @@ private:
 	std::vector<VkCommandBuffer>		m_commands;				// Vulkan command buffers
 
 	uint32_t							m_imageIndex;			// Vulkan currently frame index of swapchain
+
+	std::vector<BufferObject>			m_vertexBuffers;		// Vulkan vertex buffers
+	std::vector<BufferObject>			m_indexBuffers;			// Vulkan index buffers
+	std::vector<unsigned int>			m_indexCounts;			// Vulkan index counts
+
+	VkPipelineLayout					m_pipelineLayout;		// Vulkan pipeline layout
+	VkPipeline							m_pipeline;				// Vulkan pipeline
 };
 

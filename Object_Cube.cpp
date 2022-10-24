@@ -38,6 +38,18 @@ const unsigned int g_spriteIndex[]
 	3, 1, 5,
 };
 
+const Vertex3D g_triangle[]
+{
+	{{-1.0f,  0.0f,  0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
+	{{ 1.0f,  0.0f,  0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+	{{ 0.0f,  1.0f,  0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f}}
+};
+
+const unsigned int g_triangleIndex[]
+{
+	0, 1, 2
+};
+
 // vertex and index id
 int ObjectCube::m_id = -1;
 

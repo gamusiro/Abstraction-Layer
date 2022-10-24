@@ -235,7 +235,7 @@ int GraphicsDirectX12::CreateVertexBufferAndIndexBuffer(
 }
 
 /* Create descriptor heap for matrix buffer */
-int GraphicsDirectX12::CreateMatrixBuffer()
+int GraphicsDirectX12::CreateMatrixBuffer(int rergisterIndex)
 {
 	int retIndex = m_constantBuffers.size();
 

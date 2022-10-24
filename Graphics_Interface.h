@@ -36,8 +36,8 @@ public:
 	virtual void Uninit()									= 0;
 	virtual void Clear()									= 0;
 	virtual void Present()									= 0;
-	virtual int	 CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* vData, size_t vDataSize, const unsigned int* iData, size_t iDataSize)	= 0;
-	virtual int	 CreateMatrixBuffer() { return 0; }
+	virtual int	 CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* vData, size_t vDataNum, const unsigned int* iData, size_t iDataNum)	= 0;
+	virtual int	 CreateMatrixBuffer(int registerIndex = 0) { return 0; }
 	virtual void SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 rot, const DirectX::XMFLOAT3 scl) = 0;
 	virtual void SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up) = 0;
 	virtual void SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ) = 0;
