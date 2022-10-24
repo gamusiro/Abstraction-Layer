@@ -29,13 +29,19 @@ private:
 		VkDeviceMemory	memory;
 	};
 
+	struct ShaderParameters
+	{
+		DirectX::XMMATRIX world;
+		DirectX::XMMATRIX view;
+		DirectX::XMMATRIX proj;
+	};
+
 public:
 	bool Init(int width, int height, void* handle);
 	void Uninit();
 	void Clear();
 	void Present();
 	int	 CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* vData, size_t vDataSize, const unsigned int* iData, size_t iDataSize);
-	int	 CreateMatrixBuffer(int registerIndex = 0) override;
 	void SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 rot, const DirectX::XMFLOAT3 scl);
 	void SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up);
 	void SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ);
@@ -55,6 +61,7 @@ private:
 	bool CreateFence();
 	bool CreateSemaphores();
 	bool CreatePipeline();
+	bool CreateConstantBuffer();
 
 	BufferObject					CreateBuffer(uint32_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
 	VkPipelineShaderStageCreateInfo LoadShaderModule(const char* fileName, VkShaderStageFlagBits stage);
@@ -90,9 +97,16 @@ private:
 
 	std::vector<BufferObject>			m_vertexBuffers;		// Vulkan vertex buffers
 	std::vector<BufferObject>			m_indexBuffers;			// Vulkan index buffers
-	std::vector<unsigned int>			m_indexCounts;			// Vulkan index counts
+	std::vector<size_t>					m_indexCounts;			// Vulkan index counts
 
 	VkPipelineLayout					m_pipelineLayout;		// Vulkan pipeline layout
 	VkPipeline							m_pipeline;				// Vulkan pipeline
+
+	std::vector<BufferObject>			m_uniformBuffers;		//
+	VkDescriptorSetLayout				m_descriptorLayout;		//
+	VkDescriptorPool					m_descriptorPool;
+	std::vector<VkDescriptorSet>		m_descriptorSet;
+
+	ShaderParameters					m_ShaderParams;
 };
 

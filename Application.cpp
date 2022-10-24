@@ -61,12 +61,12 @@ bool Application::Init()
     m_camera = new ObjectCamera();
     m_camera->Init(m_width, m_height);
 
-    m_cubes.resize(5);
+    m_cubes.resize(1);
     for (size_t i = 0; i < m_cubes.size(); ++i)
     {
         m_cubes[i] = new ObjectCube();
         m_cubes[i]->Init();
-        m_cubes[i]->SetPosition({ -4.0f + 3.0f * float(i), 0, 0 });
+        m_cubes[i]->SetPosition({0, 0, 0 });
     }
 
     return true;
@@ -94,6 +94,11 @@ void Application::Uninit()
 /* Update */
 void Application::Upadte()
 {
+    static float rad;
+    rad += 0.01f;
+
+    for (size_t i = 0; i < m_cubes.size(); ++i)
+        m_cubes[i]->SetRotate({ rad, rad, 0 });
 }
 
 /* Draw */

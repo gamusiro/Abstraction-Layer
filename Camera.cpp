@@ -36,11 +36,11 @@ void ObjectCamera::Uninit()
 /* Set camera for 3d */
 void ObjectCamera::Set3D()
 {
-    static float rad;
+    /*static float rad;
     rad += 0.01f;
 
     m_position.x = 5 * cosf(rad);
-    m_position.z = 5 * sinf(rad);
+    m_position.z = 5 * sinf(rad);*/
 
     Application::Graphics()->SetViewMatrix(
         m_viewID,

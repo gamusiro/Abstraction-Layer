@@ -48,6 +48,9 @@ bool GraphicsVulkan::Init(int width, int height, void* handle)
 	if (!this->CreateSemaphores())
 		return false;
 
+	if (!this->CreateConstantBuffer())
+		return false;
+
 	if (!this->CreatePipeline())
 		return false;
 
@@ -199,32 +202,46 @@ int GraphicsVulkan::CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* 
 	return retIndex;
 }
 
-/* Create matrix buffer */
-int GraphicsVulkan::CreateMatrixBuffer(int rergisterIndex)
+void GraphicsVulkan::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const DirectX::XMFLOAT3 rot3, const DirectX::XMFLOAT3 scl3)
 {
-	return 0;
-}
+	DirectX::XMMATRIX trl, rot, scl;
+	trl = DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&pos3));
+	rot = DirectX::XMMatrixRotationRollPitchYawFromVector(DirectX::XMLoadFloat3(&rot3));
+	scl = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&scl3));
 
-void GraphicsVulkan::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 rot, const DirectX::XMFLOAT3 scl)
-{
+	m_ShaderParams.world = //DirectX::XMMatrixTranspose(scl * rot * trl);
+	m_ShaderParams.world = scl * rot * trl;
 }
 
 void GraphicsVulkan::SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up)
 {
+	DirectX::XMMATRIX view = DirectX::XMMatrixLookAtRH(DirectX::XMLoadFloat3(&pos), DirectX::XMLoadFloat3(&target), DirectX::XMLoadFloat3(&up));
+	m_ShaderParams.view = view; //DirectX::XMMatrixTranspose(view);
 }
 
 void GraphicsVulkan::SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ)
 {
+	DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovRH(fov, aspect, nearZ, farZ);
+	m_ShaderParams.proj = proj; //DirectX::XMMatrixTranspose(proj);
 }
 
 /* Draw Call */
 void GraphicsVulkan::DrawIndex(int id)
 {
+	auto memory = m_uniformBuffers[m_imageIndex].memory;
+	void* map;
+	vkMapMemory(m_device, memory, 0, VK_WHOLE_SIZE, 0, &map);
+	memcpy(map, &m_ShaderParams, sizeof(GraphicsVulkan::ShaderParameters));
+	vkUnmapMemory(m_device, memory);
+
 	vkCmdBindPipeline(m_commands[m_imageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
 	VkDeviceSize offset{};
 	vkCmdBindVertexBuffers(m_commands[m_imageIndex], 0, 1, &m_vertexBuffers[id].buffer, &offset);
 	vkCmdBindIndexBuffer(m_commands[m_imageIndex], m_indexBuffers[id].buffer, offset, VK_INDEX_TYPE_UINT32);
+
+	VkDescriptorSet descriptoSets[]{ m_descriptorSet[m_imageIndex] };
+	vkCmdBindDescriptorSets(m_commands[m_imageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, descriptoSets, 0, nullptr);
 
 	vkCmdDrawIndexed(m_commands[m_imageIndex], m_indexCounts[id], 1, 0, 0, 0);
 }
@@ -741,7 +758,9 @@ bool GraphicsVulkan::CreatePipeline()
 
 	// Layout of pipeline
 	VkPipelineLayoutCreateInfo layoutCreateInfo{};
-	layoutCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	layoutCreateInfo.sType			= VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+	layoutCreateInfo.setLayoutCount = 1;
+	layoutCreateInfo.pSetLayouts	= &m_descriptorLayout;
 	VkResult ret = vkCreatePipelineLayout(m_device, &layoutCreateInfo, nullptr, &m_pipelineLayout);
 	if (ret != VK_SUCCESS)
 		return false;
@@ -766,6 +785,83 @@ bool GraphicsVulkan::CreatePipeline()
 
 	for (const auto& s : shaderStages)
 		vkDestroyShaderModule(m_device, s.module, nullptr);
+
+	return true;
+}
+
+// Create constant buffer
+bool GraphicsVulkan::CreateConstantBuffer()
+{
+	m_uniformBuffers.resize(m_swapchainViews.size());
+	for (auto& v : m_uniformBuffers)
+	{
+		VkMemoryPropertyFlags uboFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+		v = CreateBuffer(sizeof(GraphicsVulkan::ShaderParameters), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, uboFlags);
+	}
+
+	// Create constant buffer
+	VkDescriptorSetLayoutBinding binding{};
+	binding.binding			= 0;
+	binding.descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	binding.stageFlags		= VK_SHADER_STAGE_VERTEX_BIT;
+	binding.descriptorCount	= 1;
+
+	// Create layout
+	VkDescriptorSetLayoutCreateInfo layoutCreateInfo{};
+	layoutCreateInfo.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+	layoutCreateInfo.bindingCount	= 1;
+	layoutCreateInfo.pBindings		= &binding;
+	VkResult ret = vkCreateDescriptorSetLayout(m_device, &layoutCreateInfo, nullptr, &m_descriptorLayout);
+	if (ret != VK_SUCCESS)
+		return false;
+
+	// Create pool
+	VkDescriptorPoolSize descPoolSize;
+	descPoolSize.descriptorCount	= uint32_t(m_uniformBuffers.size());
+	descPoolSize.type				= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+
+	VkDescriptorPoolCreateInfo poolCreateInfo{};
+	poolCreateInfo.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolCreateInfo.maxSets			= uint32_t(m_uniformBuffers.size());
+	poolCreateInfo.poolSizeCount	= 1;
+	poolCreateInfo.pPoolSizes		= &descPoolSize;
+	ret = vkCreateDescriptorPool(m_device, &poolCreateInfo, nullptr, &m_descriptorPool);
+	if (ret != VK_SUCCESS)
+		return false;
+
+	std::vector<VkDescriptorSetLayout> layouts;
+	for (int i = 0; i<int(m_uniformBuffers.size()); ++i)
+	{
+		layouts.push_back(m_descriptorLayout);
+	}
+	VkDescriptorSetAllocateInfo ai{};
+	ai.sType				= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	ai.descriptorPool		= m_descriptorPool;
+	ai.descriptorSetCount	= uint32_t(m_uniformBuffers.size());
+	ai.pSetLayouts			= layouts.data();
+	m_descriptorSet.resize(m_uniformBuffers.size());
+	ret = vkAllocateDescriptorSets(m_device, &ai, m_descriptorSet.data());
+	if (ret != VK_SUCCESS)
+		return false;
+
+	// ディスクリプタセットへ書き込み.
+	for (int i = 0; i<int(m_uniformBuffers.size()); ++i)
+	{
+		VkDescriptorBufferInfo descUBO{};
+		descUBO.buffer = m_uniformBuffers[i].buffer;
+		descUBO.offset = 0;
+		descUBO.range = VK_WHOLE_SIZE;
+
+		VkWriteDescriptorSet ubo{};
+		ubo.sType			= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		ubo.dstBinding		= 0;
+		ubo.descriptorCount = 1;
+		ubo.descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		ubo.pBufferInfo		= &descUBO;
+		ubo.dstSet			= m_descriptorSet[i];						// モデルそれぞれにVkDescriptorSetが必要
+
+		vkUpdateDescriptorSets(m_device, 1, &ubo, 0, nullptr);
+	}
 
 	return true;
 }

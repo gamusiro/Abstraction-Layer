@@ -25,8 +25,8 @@ public:
 	virtual void Draw()		= 0;
 
 	void SetPosition(DirectX::XMFLOAT3 pos) { m_position = pos; }
-	void SetRotate(DirectX::XMFLOAT3 rot) { m_position = rot; }
-	void SetScale(DirectX::XMFLOAT3 scl) { m_position = scl; }
+	void SetRotate(DirectX::XMFLOAT3 rot) { m_rotate = rot; }
+	void SetScale(DirectX::XMFLOAT3 scl) { m_scale = scl; }
 
 protected:
 	int					m_worldID;
