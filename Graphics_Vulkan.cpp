@@ -202,6 +202,75 @@ int GraphicsVulkan::CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* 
 	return retIndex;
 }
 
+/* Create matrix buffer */
+int GraphicsVulkan::CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index)
+{
+	int retIndex = m_uniformBuffers.size();
+
+	// Create buffer and memory resource
+	//m_uniformBuffers.resize(m_swapchainViews.size());
+	UniformBuffer uBuffer{};
+	uBuffer.buffer.resize(m_swapchainViews.size());
+	for (auto& v : uBuffer.buffer)
+	{
+		VkMemoryPropertyFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+		v = CreateBuffer(sizeof(DirectX::XMMATRIX), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, flags);
+	}
+
+	// Create pool
+	VkDescriptorPoolSize descPoolSize;
+	descPoolSize.descriptorCount	= uint32_t(uBuffer.buffer.size());
+	descPoolSize.type				= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+
+	VkDescriptorPoolCreateInfo poolCreateInfo{};
+	poolCreateInfo.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolCreateInfo.maxSets			= uint32_t(uBuffer.buffer.size());
+	poolCreateInfo.poolSizeCount	= 1;
+	poolCreateInfo.pPoolSizes		= &descPoolSize;
+	VkResult ret = vkCreateDescriptorPool(m_device, &poolCreateInfo, nullptr, &uBuffer.pool);
+	if (ret != VK_SUCCESS)
+		return false;
+
+	std::vector<VkDescriptorSetLayout> layouts;
+	for (int i = 0; i<int(uBuffer.buffer.size()); ++i)
+		layouts.push_back(m_descriptorLayout);
+
+	VkDescriptorSetAllocateInfo ai{};
+	ai.sType				= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	ai.descriptorPool		= uBuffer.pool;
+	ai.descriptorSetCount	= uint32_t(uBuffer.buffer.size());
+	ai.pSetLayouts			= layouts.data();
+
+	uBuffer.sets.resize(uBuffer.buffer.size());
+	ret = vkAllocateDescriptorSets(m_device, &ai, uBuffer.sets.data());
+	if (ret != VK_SUCCESS)
+		return false;
+
+	// Write to descriptor set.
+	for (int i = 0; i< int(uBuffer.buffer.size()); ++i)
+	{
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer	= uBuffer.buffer[i].buffer;
+		bufferInfo.offset	= 0;
+		bufferInfo.range	= VK_WHOLE_SIZE;
+
+		VkWriteDescriptorSet set{};
+		set.sType			= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		set.dstBinding		= 1;
+		set.descriptorCount = 1;
+		set.descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		set.pBufferInfo		= &bufferInfo;
+		set.dstSet			= uBuffer.sets[i];
+
+		vkUpdateDescriptorSets(m_device, 1, &set, 0, nullptr);
+	}
+
+	m_uniformBuffers.push_back(uBuffer);
+
+	return retIndex;
+}
+
+/* Set world matrix */
 void GraphicsVulkan::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const DirectX::XMFLOAT3 rot3, const DirectX::XMFLOAT3 scl3)
 {
 	DirectX::XMMATRIX trl, rot, scl;
@@ -209,39 +278,40 @@ void GraphicsVulkan::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const 
 	rot = DirectX::XMMatrixRotationRollPitchYawFromVector(DirectX::XMLoadFloat3(&rot3));
 	scl = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&scl3));
 
-	m_ShaderParams.world = //DirectX::XMMatrixTranspose(scl * rot * trl);
-	m_ShaderParams.world = scl * rot * trl;
+	m_world = scl * rot * trl;
+
+	auto wvp = m_world * m_view * m_proj;
+
+	VkDeviceMemory memory = m_uniformBuffers[id].buffer[m_imageIndex].memory;
+	void* map;
+	vkMapMemory(m_device, memory, 0, VK_WHOLE_SIZE, 0, &map);
+	memcpy(map, &wvp, sizeof(DirectX::XMMATRIX));
+	vkUnmapMemory(m_device, memory);
+
+	VkDescriptorSet descriptoSets[]{ m_uniformBuffers[id].sets[m_imageIndex] };
+	vkCmdBindDescriptorSets(m_commands[m_imageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, descriptoSets, 0, nullptr);
 }
 
 void GraphicsVulkan::SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up)
 {
 	DirectX::XMMATRIX view = DirectX::XMMatrixLookAtRH(DirectX::XMLoadFloat3(&pos), DirectX::XMLoadFloat3(&target), DirectX::XMLoadFloat3(&up));
-	m_ShaderParams.view = view; //DirectX::XMMatrixTranspose(view);
+	m_view = view; //DirectX::XMMatrixTranspose(view);
 }
 
 void GraphicsVulkan::SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ)
 {
 	DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovRH(fov, aspect, nearZ, farZ);
-	m_ShaderParams.proj = proj; //DirectX::XMMatrixTranspose(proj);
+	m_proj = proj; //DirectX::XMMatrixTranspose(proj);
 }
 
 /* Draw Call */
 void GraphicsVulkan::DrawIndex(int id)
 {
-	auto memory = m_uniformBuffers[m_imageIndex].memory;
-	void* map;
-	vkMapMemory(m_device, memory, 0, VK_WHOLE_SIZE, 0, &map);
-	memcpy(map, &m_ShaderParams, sizeof(GraphicsVulkan::ShaderParameters));
-	vkUnmapMemory(m_device, memory);
-
 	vkCmdBindPipeline(m_commands[m_imageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline);
 
 	VkDeviceSize offset{};
 	vkCmdBindVertexBuffers(m_commands[m_imageIndex], 0, 1, &m_vertexBuffers[id].buffer, &offset);
 	vkCmdBindIndexBuffer(m_commands[m_imageIndex], m_indexBuffers[id].buffer, offset, VK_INDEX_TYPE_UINT32);
-
-	VkDescriptorSet descriptoSets[]{ m_descriptorSet[m_imageIndex] };
-	vkCmdBindDescriptorSets(m_commands[m_imageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, descriptoSets, 0, nullptr);
 
 	vkCmdDrawIndexed(m_commands[m_imageIndex], m_indexCounts[id], 1, 0, 0, 0);
 }
@@ -792,76 +862,34 @@ bool GraphicsVulkan::CreatePipeline()
 // Create constant buffer
 bool GraphicsVulkan::CreateConstantBuffer()
 {
-	m_uniformBuffers.resize(m_swapchainViews.size());
-	for (auto& v : m_uniformBuffers)
-	{
-		VkMemoryPropertyFlags uboFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
-		v = CreateBuffer(sizeof(GraphicsVulkan::ShaderParameters), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, uboFlags);
-	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Create descriptor layout
+	VkDescriptorSetLayoutBinding binding[3];
+	binding[0].binding			= CONSTANT_BUFFER_INDEX::WORLD_MATRIX;
+	binding[0].descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	binding[0].stageFlags		= VK_SHADER_STAGE_VERTEX_BIT;
+	binding[0].descriptorCount	= 1;
 
-	// Create constant buffer
-	VkDescriptorSetLayoutBinding binding{};
-	binding.binding			= 0;
-	binding.descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	binding.stageFlags		= VK_SHADER_STAGE_VERTEX_BIT;
-	binding.descriptorCount	= 1;
+	binding[1].binding			= CONSTANT_BUFFER_INDEX::VIEW_MATRIX;
+	binding[1].descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	binding[1].stageFlags		= VK_SHADER_STAGE_VERTEX_BIT;
+	binding[1].descriptorCount	= 1;
+
+	binding[2].binding			= CONSTANT_BUFFER_INDEX::PROJECTION_MATRIX;
+	binding[2].descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	binding[2].stageFlags		= VK_SHADER_STAGE_VERTEX_BIT;
+	binding[2].descriptorCount	= 1;
 
 	// Create layout
 	VkDescriptorSetLayoutCreateInfo layoutCreateInfo{};
 	layoutCreateInfo.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	layoutCreateInfo.bindingCount	= 1;
-	layoutCreateInfo.pBindings		= &binding;
+	layoutCreateInfo.bindingCount	= _countof(binding);
+	layoutCreateInfo.pBindings		= binding;
 	VkResult ret = vkCreateDescriptorSetLayout(m_device, &layoutCreateInfo, nullptr, &m_descriptorLayout);
 	if (ret != VK_SUCCESS)
 		return false;
 
-	// Create pool
-	VkDescriptorPoolSize descPoolSize;
-	descPoolSize.descriptorCount	= uint32_t(m_uniformBuffers.size());
-	descPoolSize.type				= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-
-	VkDescriptorPoolCreateInfo poolCreateInfo{};
-	poolCreateInfo.sType			= VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolCreateInfo.maxSets			= uint32_t(m_uniformBuffers.size());
-	poolCreateInfo.poolSizeCount	= 1;
-	poolCreateInfo.pPoolSizes		= &descPoolSize;
-	ret = vkCreateDescriptorPool(m_device, &poolCreateInfo, nullptr, &m_descriptorPool);
-	if (ret != VK_SUCCESS)
-		return false;
-
-	std::vector<VkDescriptorSetLayout> layouts;
-	for (int i = 0; i<int(m_uniformBuffers.size()); ++i)
-	{
-		layouts.push_back(m_descriptorLayout);
-	}
-	VkDescriptorSetAllocateInfo ai{};
-	ai.sType				= VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	ai.descriptorPool		= m_descriptorPool;
-	ai.descriptorSetCount	= uint32_t(m_uniformBuffers.size());
-	ai.pSetLayouts			= layouts.data();
-	m_descriptorSet.resize(m_uniformBuffers.size());
-	ret = vkAllocateDescriptorSets(m_device, &ai, m_descriptorSet.data());
-	if (ret != VK_SUCCESS)
-		return false;
-
-	// ディスクリプタセットへ書き込み.
-	for (int i = 0; i<int(m_uniformBuffers.size()); ++i)
-	{
-		VkDescriptorBufferInfo descUBO{};
-		descUBO.buffer = m_uniformBuffers[i].buffer;
-		descUBO.offset = 0;
-		descUBO.range = VK_WHOLE_SIZE;
-
-		VkWriteDescriptorSet ubo{};
-		ubo.sType			= VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		ubo.dstBinding		= 0;
-		ubo.descriptorCount = 1;
-		ubo.descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		ubo.pBufferInfo		= &descUBO;
-		ubo.dstSet			= m_descriptorSet[i];						// モデルそれぞれにVkDescriptorSetが必要
-
-		vkUpdateDescriptorSets(m_device, 1, &ubo, 0, nullptr);
-	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	return true;
 }

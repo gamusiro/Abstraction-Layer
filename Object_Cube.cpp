@@ -66,7 +66,7 @@ bool ObjectCube::Init()
 			return false;
 	}
 
-	m_worldID = Application::Graphics()->CreateMatrixBuffer();
+	m_worldID = Application::Graphics()->CreateMatrixBuffer(CONSTANT_BUFFER_INDEX::WORLD_MATRIX);
 
 	return true;
 }

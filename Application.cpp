@@ -61,12 +61,12 @@ bool Application::Init()
     m_camera = new ObjectCamera();
     m_camera->Init(m_width, m_height);
 
-    m_cubes.resize(1);
+    m_cubes.resize(5);
     for (size_t i = 0; i < m_cubes.size(); ++i)
     {
         m_cubes[i] = new ObjectCube();
         m_cubes[i]->Init();
-        m_cubes[i]->SetPosition({0, 0, 0 });
+        m_cubes[i]->SetPosition({float(-6.0f + 3.0f * i), 0, 0 });
     }
 
     return true;

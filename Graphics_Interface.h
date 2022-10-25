@@ -18,6 +18,19 @@ namespace structure
 	};
 }
 
+//**************************************************
+/// \brief These are roots index for send to shader
+/// 
+/// \return none
+//**************************************************
+enum CONSTANT_BUFFER_INDEX
+{
+	WORLD_MATRIX		= 0,	// World buffer index
+	VIEW_MATRIX			= 1,	// View buffer index
+	PROJECTION_MATRIX	= 2,	// Projection buffer index
+	TEXTURE_INDEX		= 3		// Texture buffer index
+};
+
 
 //**************************************************
 /// \brief Object release macro
@@ -37,7 +50,7 @@ public:
 	virtual void Clear()									= 0;
 	virtual void Present()									= 0;
 	virtual int	 CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* vData, size_t vDataNum, const unsigned int* iData, size_t iDataNum)	= 0;
-	virtual int	 CreateMatrixBuffer() { return 0; }
+	virtual int	 CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index) { return 0; }
 	virtual void SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 rot, const DirectX::XMFLOAT3 scl) = 0;
 	virtual void SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up) = 0;
 	virtual void SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ) = 0;

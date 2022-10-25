@@ -12,19 +12,6 @@
 using namespace structure;
 using namespace DirectX;
 
-//**************************************************
-/// \brief These are roots index for send to shader
-/// 
-/// \return none
-//**************************************************
-enum CONSTANT_BUFFER_INDEX
-{
-	WORLD_MATRIX		= 0,	// World buffer root index
-	VIEW_MATRIX			= 1,	// View buffer root index
-	PROJECTION_MATRIX	= 2,	// Projection buffer root index
-	TEXTURE_INDEX		= 3		// Texture buffer root index
-};
-
 /* Initialize */
 bool GraphicsDirectX12::Init(int width, int height, void* handle)
 {
@@ -235,8 +222,10 @@ int GraphicsDirectX12::CreateVertexBufferAndIndexBuffer(
 }
 
 /* Create descriptor heap for matrix buffer */
-int GraphicsDirectX12::CreateMatrixBuffer()
+int GraphicsDirectX12::CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index)
 {
+	UNREFERENCED_PARAMETER(index);
+
 	int retIndex = m_constantBuffers.size();
 
 	HRESULT ret{};

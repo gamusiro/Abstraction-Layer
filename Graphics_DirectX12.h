@@ -66,7 +66,7 @@ public:
 	/// 
 	/// \return control id
 	//**************************************************
-	int CreateMatrixBuffer() override;
+	int CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index) override;
 
 	//**************************************************
 	/// \brief Set world matrix

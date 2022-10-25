@@ -13,8 +13,8 @@ using namespace DirectX;
 /* Initialize */
 bool ObjectCamera::Init(int width, int height)
 {
-    m_viewID        = Application::Graphics()->CreateMatrixBuffer();
-    m_projectionID  = Application::Graphics()->CreateMatrixBuffer();
+    m_viewID        = Application::Graphics()->CreateMatrixBuffer(CONSTANT_BUFFER_INDEX::VIEW_MATRIX);
+    m_projectionID  = Application::Graphics()->CreateMatrixBuffer(CONSTANT_BUFFER_INDEX::PROJECTION_MATRIX);
 
     m_fov       = XM_PIDIV2;
     m_aspect    = float(width / height);

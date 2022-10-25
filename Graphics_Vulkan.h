@@ -29,19 +29,13 @@ private:
 		VkDeviceMemory	memory;
 	};
 
-	struct ShaderParameters
-	{
-		DirectX::XMMATRIX world;
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX proj;
-	};
-
 public:
 	bool Init(int width, int height, void* handle);
 	void Uninit();
 	void Clear();
 	void Present();
 	int	 CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* vData, size_t vDataSize, const unsigned int* iData, size_t iDataSize);
+	int	 CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index);
 	void SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 rot, const DirectX::XMFLOAT3 scl);
 	void SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up);
 	void SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ);
@@ -102,11 +96,23 @@ private:
 	VkPipelineLayout					m_pipelineLayout;		// Vulkan pipeline layout
 	VkPipeline							m_pipeline;				// Vulkan pipeline
 
-	std::vector<BufferObject>			m_uniformBuffers;		//
-	VkDescriptorSetLayout				m_descriptorLayout;		//
-	VkDescriptorPool					m_descriptorPool;
-	std::vector<VkDescriptorSet>		m_descriptorSet;
+	struct UniformBuffer
+	{
+		std::vector<BufferObject>		buffer;
+		VkDescriptorPool				pool;
+		std::vector<VkDescriptorSet>	sets;
+	};
 
-	ShaderParameters					m_ShaderParams;
+	std::vector<UniformBuffer>			m_uniformBuffers;
+	VkDescriptorSetLayout				m_descriptorLayout;		//
+	std::vector<VkDescriptorSet>		m_descriptorSets;
+
+	//std::vector<BufferObject>			m_uniformBuffers;		//
+	//VkDescriptorPool					m_descriptorPool;
+	//std::vector<VkDescriptorSet>		m_descriptorSet;
+
+	DirectX::XMMATRIX					m_world;
+	DirectX::XMMATRIX					m_view;
+	DirectX::XMMATRIX					m_proj;
 };
 
