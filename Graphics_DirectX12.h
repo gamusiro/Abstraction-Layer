@@ -24,7 +24,7 @@ public:
 	bool Init(int width, int height, void* handle) override;
 
 	//**************************************************
-	/// \brief Uninitialize DirectX11
+	/// \brief Uninitialize DirectX12
 	/// 
 	/// \return none
 	//**************************************************
@@ -101,7 +101,7 @@ public:
 	) override;
 
 	//**************************************************
-	/// \brief Set view matrix
+	/// \brief Set projection matrix
 	/// 
 	/// \param[in] fov
 	/// \param[in] aspect

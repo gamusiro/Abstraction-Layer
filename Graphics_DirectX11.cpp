@@ -103,9 +103,9 @@ int GraphicsDirectX11::CreateVertexBufferAndIndexBuffer(
 	{// Create vertex buffer
 		ID3D11Buffer* vertexBuffer;
 		D3D11_BUFFER_DESC bufferDesc{};
-		bufferDesc.ByteWidth = sizeof(Vertex3D) * vDataNum;
-		bufferDesc.Usage = D3D11_USAGE::D3D11_USAGE_DEFAULT;
-		bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER;
+		bufferDesc.ByteWidth	= UINT(sizeof(Vertex3D) * vDataNum);
+		bufferDesc.Usage		= D3D11_USAGE::D3D11_USAGE_DEFAULT;
+		bufferDesc.BindFlags	= D3D11_BIND_FLAG::D3D11_BIND_VERTEX_BUFFER;
 
 		D3D11_SUBRESOURCE_DATA subResource{};
 		subResource.pSysMem = vData;
@@ -119,7 +119,7 @@ int GraphicsDirectX11::CreateVertexBufferAndIndexBuffer(
 	{// Create Index buffer
 		ID3D11Buffer* indexBuffer;
 		D3D11_BUFFER_DESC bufferDesc{};
-		bufferDesc.ByteWidth	= sizeof(unsigned int) * iDataNum;
+		bufferDesc.ByteWidth	= UINT(sizeof(unsigned int) * iDataNum);
 		bufferDesc.Usage		= D3D11_USAGE::D3D11_USAGE_DEFAULT;
 		bufferDesc.BindFlags	= D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER;
 
@@ -138,6 +138,8 @@ int GraphicsDirectX11::CreateVertexBufferAndIndexBuffer(
 /* Send world matrix to vertex shader */
 void GraphicsDirectX11::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const DirectX::XMFLOAT3 rot3, const DirectX::XMFLOAT3 scl3)
 {
+	UNREFERENCED_PARAMETER(id);
+
 	XMMATRIX trl, rot, scl, world;
 	trl		= XMMatrixTranslationFromVector(XMLoadFloat3(&pos3));
 	rot		= XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&rot3));
@@ -150,6 +152,8 @@ void GraphicsDirectX11::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, con
 /* Send view matrix to vertex shader */
 void GraphicsDirectX11::SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up)
 {
+	UNREFERENCED_PARAMETER(id);
+
 	XMMATRIX view = XMMatrixLookAtLH(XMLoadFloat3(&pos), XMLoadFloat3(&target), XMLoadFloat3(&up));
 	view = XMMatrixTranspose(view);
 
@@ -159,6 +163,8 @@ void GraphicsDirectX11::SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const
 /* Send projection matrix to vertex shader */
 void GraphicsDirectX11::SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ)
 {
+	UNREFERENCED_PARAMETER(id);
+
 	XMMATRIX projection = XMMatrixPerspectiveFovLH(fov, aspect, nearZ, farZ);
 	projection = XMMatrixTranspose(projection);
 
@@ -174,7 +180,7 @@ void GraphicsDirectX11::DrawIndex(int index)
 	m_context->IASetIndexBuffer(m_indexBuffers[index].buffer, DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 
 	m_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_context->DrawIndexed(m_indexBuffers[index].indexNum, 0, 0);
+	m_context->DrawIndexed(UINT(m_indexBuffers[index].indexNum), 0, 0);
 }
 
 // Create device and swapchain

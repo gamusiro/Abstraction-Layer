@@ -30,36 +30,214 @@ private:
 	};
 
 public:
+	//**************************************************
+	/// \brief Initialize Vulkan
+	/// 
+	/// \return Success is true
+	//**************************************************
 	bool Init(int width, int height, void* handle);
+	
+	//**************************************************
+	/// \brief Uninitialize Vulkan
+	/// 
+	/// \return none
+	//**************************************************
 	void Uninit();
+
+	//**************************************************
+	/// \brief Clear screen
+	/// 
+	/// \return none
+	//**************************************************
 	void Clear();
+
+	//**************************************************
+	/// \brief Present buffer
+	/// 
+	/// \return none
+	//**************************************************
 	void Present();
+
+	//**************************************************
+	/// \brief Create buffer
+	/// 
+	/// \param[in] vData	-> model vertex data
+	/// \param[in] vDataNum	-> count vertex
+	/// \param[in] iData	-> model index data
+	/// \param[in] iDataNum	-> count index
+	/// 
+	/// \return control id
+	//**************************************************
 	int	 CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* vData, size_t vDataSize, const unsigned int* iData, size_t iDataSize);
+	
+	//**************************************************
+	/// \brief Create matrix buffer
+	/// 
+	/// \return control id
+	//**************************************************
 	int	 CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index);
+	
+	//**************************************************
+	/// \brief Set world matrix
+	/// 
+	/// \param[in] pos -> position of model in 3d space
+	/// \param[in] rot -> angle of model 
+	/// \param[in] pos -> scale of model
+	/// 
+	/// \return none
+	//**************************************************
 	void SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 rot, const DirectX::XMFLOAT3 scl);
+	
+	//**************************************************
+	/// \brief Set view matrix
+	/// 
+	/// \param[in] pos		-> position of camera in 3d space
+	/// \param[in] target	-> position of focus in 3d space 
+	/// \param[in] up		-> up
+	/// 
+	/// \return none
+	//**************************************************
 	void SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up);
+	
+	//**************************************************
+	/// \brief Set projection matrix
+	/// 
+	/// \param[in] fov
+	/// \param[in] aspect
+	/// \param[in] nearZ
+	/// \param[in] farZ
+	/// 
+	/// \return none
+	//**************************************************
 	void SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ);
+
+	//**************************************************
+	/// \brief Set vertex buffer and index buffer
+	/// 
+	/// \param[in] control id
+	/// 
+	/// \return none
+	//**************************************************
 	void DrawIndex(int id);
 
 private:
+	//**************************************************
+	/// \brief Create instance
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateInstance();
+	
+	//**************************************************
+	/// \brief Select Physical device
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool SelectPhysicalDevice();
+
+	//**************************************************
+	/// \brief Create logical device
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateDevice();
+
+	//**************************************************
+	/// \brief Create command pool
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateCommandPool();
+
+	//**************************************************
+	/// \brief Create surface
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateSurface(HWND hWnd);
+
+	//**************************************************
+	/// \brief Select surface format
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool SelectSurfaceFormat();
+
+	//**************************************************
+	/// \brief Create swap chain
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateSwapchain(const int width, const int height);
+	
+	//**************************************************
+	/// \brief Create depth buffer
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateDepthBuffer();
+
+	//**************************************************
+	/// \brief Create render pass
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateRenderPass();
+
+	//**************************************************
+	/// \brief Create frame buffer
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateFrameBuffer();
+
+	//**************************************************
+	/// \brief Create fence
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateFence();
+
+	//**************************************************
+	/// \brief Create semaphores
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateSemaphores();
+
+	//**************************************************
+	/// \brief Create pipeline
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreatePipeline();
+
+	//**************************************************
+	/// \brief Create constant buffer
+	/// 
+	/// \return Succcess is true
+	//**************************************************
 	bool CreateConstantBuffer();
 
+	//**************************************************
+	/// \brief Create buffer object
+	/// 
+	/// \return Buffer object
+	//**************************************************
 	BufferObject					CreateBuffer(uint32_t size, VkBufferUsageFlags usage, VkMemoryPropertyFlags flags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+	
+	//**************************************************
+	/// \brief Load shader of spv file
+	/// 
+	/// \return VkPipelineShaderStageCreateInfo
+	//**************************************************
 	VkPipelineShaderStageCreateInfo LoadShaderModule(const char* fileName, VkShaderStageFlagBits stage);
 
+	//**************************************************
+	/// \brief Get memory type
+	/// 
+	/// \return memory type index
+	//**************************************************
 	uint32_t getMemoryTypeIndex(uint32_t requestBits, VkMemoryPropertyFlags requestProperty) const;
 
 private:
@@ -98,20 +276,16 @@ private:
 
 	struct UniformBuffer
 	{
-		std::vector<BufferObject>		buffer;
-		VkDescriptorPool				pool;
-		std::vector<VkDescriptorSet>	sets;
+		std::vector<BufferObject>		buffer;					// constant buffer objects
+		VkDescriptorPool				pool;					// Vulkan descriptor pool 
+		std::vector<VkDescriptorSet>	sets;					// Vulkan descriptor sets
 	};
 
-	std::vector<UniformBuffer>			m_uniformBuffers;
-	VkDescriptorSetLayout				m_descriptorLayout;		//
-	std::vector<VkDescriptorSet>		m_descriptorSets;
+	std::vector<UniformBuffer>			m_uniformBuffers;		// Constant buffers
+	VkDescriptorSetLayout				m_descriptorLayout;		// Vulkan descriptor layout
+	std::vector<VkDescriptorSet>		m_descriptorSets;		//
 
-	//std::vector<BufferObject>			m_uniformBuffers;		//
-	//VkDescriptorPool					m_descriptorPool;
-	//std::vector<VkDescriptorSet>		m_descriptorSet;
 
-	DirectX::XMMATRIX					m_world;
 	DirectX::XMMATRIX					m_view;
 	DirectX::XMMATRIX					m_proj;
 };

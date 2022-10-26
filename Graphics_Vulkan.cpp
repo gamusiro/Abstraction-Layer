@@ -4,6 +4,7 @@
 *		File	: Graphics_Vulkan.cpp
 *		Detail	:
 ===================================================================================*/
+#pragma warning(disable:26812)
 #include <fstream>
 
 #include "Graphics_Vulkan.h"
@@ -61,6 +62,8 @@ bool GraphicsVulkan::Init(int width, int height, void* handle)
 void GraphicsVulkan::Uninit()
 {
 	vkDeviceWaitIdle(m_device);
+
+
 
 	vkDestroyPipelineLayout(m_device, m_pipelineLayout, nullptr);
 	vkDestroyPipeline(m_device, m_pipeline, nullptr);
@@ -169,10 +172,10 @@ void GraphicsVulkan::Present()
 /* Create vertex buffer and index buffer */
 int GraphicsVulkan::CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* vData, size_t vDataNum, const unsigned int* iData, size_t iDataNum)
 {
-	int retIndex = m_vertexBuffers.size();
+	int retIndex = int(m_vertexBuffers.size());
 
-	BufferObject vertex = this->CreateBuffer(sizeof(Vertex3D) * vDataNum, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
-	BufferObject index  = this->CreateBuffer(sizeof(unsigned int) * iDataNum, VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
+	BufferObject vertex = this->CreateBuffer(uint32_t(sizeof(Vertex3D) * vDataNum), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT);
+	BufferObject index  = this->CreateBuffer(uint32_t(sizeof(unsigned int) * iDataNum), VK_BUFFER_USAGE_INDEX_BUFFER_BIT);
 
 	VkResult ret{};
 	{// Write data of vertices to memory
@@ -205,7 +208,9 @@ int GraphicsVulkan::CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* 
 /* Create matrix buffer */
 int GraphicsVulkan::CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index)
 {
-	int retIndex = m_uniformBuffers.size();
+	UNREFERENCED_PARAMETER(index);
+
+	int retIndex = int(m_uniformBuffers.size());
 
 	// Create buffer and memory resource
 	//m_uniformBuffers.resize(m_swapchainViews.size());
@@ -218,7 +223,7 @@ int GraphicsVulkan::CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index)
 	}
 
 	// Create pool
-	VkDescriptorPoolSize descPoolSize;
+	VkDescriptorPoolSize descPoolSize{};
 	descPoolSize.descriptorCount	= uint32_t(uBuffer.buffer.size());
 	descPoolSize.type				= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 
@@ -278,9 +283,7 @@ void GraphicsVulkan::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const 
 	rot = DirectX::XMMatrixRotationRollPitchYawFromVector(DirectX::XMLoadFloat3(&rot3));
 	scl = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&scl3));
 
-	m_world = scl * rot * trl;
-
-	auto wvp = m_world * m_view * m_proj;
+	auto wvp = scl * rot * trl * m_view * m_proj;
 
 	VkDeviceMemory memory = m_uniformBuffers[id].buffer[m_imageIndex].memory;
 	void* map;
@@ -292,16 +295,22 @@ void GraphicsVulkan::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const 
 	vkCmdBindDescriptorSets(m_commands[m_imageIndex], VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, descriptoSets, 0, nullptr);
 }
 
+/* Set view matrix */
 void GraphicsVulkan::SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up)
 {
+	UNREFERENCED_PARAMETER(id);
+
 	DirectX::XMMATRIX view = DirectX::XMMatrixLookAtRH(DirectX::XMLoadFloat3(&pos), DirectX::XMLoadFloat3(&target), DirectX::XMLoadFloat3(&up));
-	m_view = view; //DirectX::XMMatrixTranspose(view);
+	m_view = view;
 }
 
+/* Set proj matrix */
 void GraphicsVulkan::SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ)
 {
+	UNREFERENCED_PARAMETER(id);
+
 	DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovRH(fov, aspect, nearZ, farZ);
-	m_proj = proj; //DirectX::XMMatrixTranspose(proj);
+	m_proj = proj;
 }
 
 /* Draw Call */
@@ -313,7 +322,7 @@ void GraphicsVulkan::DrawIndex(int id)
 	vkCmdBindVertexBuffers(m_commands[m_imageIndex], 0, 1, &m_vertexBuffers[id].buffer, &offset);
 	vkCmdBindIndexBuffer(m_commands[m_imageIndex], m_indexBuffers[id].buffer, offset, VK_INDEX_TYPE_UINT32);
 
-	vkCmdDrawIndexed(m_commands[m_imageIndex], m_indexCounts[id], 1, 0, 0, 0);
+	vkCmdDrawIndexed(m_commands[m_imageIndex], uint32_t(m_indexCounts[id]), 1, 0, 0, 0);
 }
 
 // Create instance
@@ -344,17 +353,6 @@ bool GraphicsVulkan::CreateInstance()
 	createInfo.enabledExtensionCount	= uint32_t(extensionsName.size());
 	createInfo.ppEnabledExtensionNames	= extensionsName.data();
 	createInfo.pApplicationInfo			= &appInfo;
-
-#ifdef _DEBUG 
-  // デバッグビルド時には検証レイヤーを有効化
-  const char* layers[] = { "VK_LAYER_KHRONOS_validation" };
-  if (VK_HEADER_VERSION_COMPLETE < VK_MAKE_VERSION(1, 1, 106)) {
-      // "VK_LAYER_LUNARG_standard_validation" は廃止になっているが昔の Vulkan SDK では動くので対処しておく.
-      layers[0] = "VK_LAYER_LUNARG_standard_validation";
-  }
-  createInfo.enabledLayerCount = 1;
-  createInfo.ppEnabledLayerNames = layers;
-#endif
 
 	VkResult ret = vkCreateInstance(&createInfo, nullptr, &m_instance);
 	if (ret != VK_SUCCESS)
@@ -609,7 +607,7 @@ bool GraphicsVulkan::CreateRenderPass()
 	VkRenderPassCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 
-	std::array<VkAttachmentDescription, 2> attachments;
+	std::array<VkAttachmentDescription, 2> attachments{};
 	VkAttachmentDescription& colorTarget = attachments[0];
 	VkAttachmentDescription& depthTarget = attachments[1];
 
@@ -672,7 +670,7 @@ bool GraphicsVulkan::CreateFrameBuffer()
 
 	for (size_t i = 0; i < m_swapchainViews.size(); ++i)
 	{
-		std::array<VkImageView, 2> attachments;
+		std::array<VkImageView, 2> attachments{};
 		attachments[0]				= m_swapchainViews[i];
 		attachments[1]				= m_depthBufferView;
 		createInfo.attachmentCount	= uint32_t(attachments.size());
@@ -864,7 +862,7 @@ bool GraphicsVulkan::CreateConstantBuffer()
 {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Create descriptor layout
-	VkDescriptorSetLayoutBinding binding[3];
+	VkDescriptorSetLayoutBinding binding[3]{};
 	binding[0].binding			= CONSTANT_BUFFER_INDEX::WORLD_MATRIX;
 	binding[0].descriptorType	= VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	binding[0].stageFlags		= VK_SHADER_STAGE_VERTEX_BIT;

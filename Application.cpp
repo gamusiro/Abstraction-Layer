@@ -19,6 +19,7 @@ IGraphics*                  Application::m_graphics = nullptr;
 Application::USING_API_TYPE Application::m_apiType;
 
 
+
 /* Constructor */
 Application::Application(const int width, const int height, const void* hInstance, USING_API_TYPE type)
     : WindowDesktop(width, height, (HINSTANCE)hInstance, L"Application", DefMyWndProc)
