@@ -9,6 +9,7 @@
 
 #include "Graphics_DirectX11.h"
 #include "Graphics_DirectX12.h"
+#include "Graphics_OpenGL.h"
 #include "Graphics_Vulkan.h"
 
 #include "Camera.h"
@@ -45,6 +46,7 @@ bool Application::Init()
         m_graphics = new GraphicsDirectX12();
         break;
     case Application::USING_API_TYPE::OPENGL:
+        m_graphics = new Graphics_OpenGL();
         break;
     case Application::USING_API_TYPE::VULKAN:
         m_graphics = new GraphicsVulkan();

@@ -19,7 +19,7 @@ int __stdcall WinMain(
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	{
-		Application app(1280, 780, hInstance, Application::USING_API_TYPE::VULKAN);
+		Application app(1280, 780, hInstance, Application::USING_API_TYPE::OPENGL);
 
 		if (app.Init())
 		{

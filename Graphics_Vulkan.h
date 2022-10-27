@@ -5,7 +5,6 @@
 *		Detail	:
 ===================================================================================*/
 #pragma once
-#include <vector>
 #include <array>
 
 #define NOMINMAX

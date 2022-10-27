@@ -72,23 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\VulkanSDK\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\VulkanSDK\Include;C:\Program Files %28x86%29\OpenGL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\OpenGL\lib\x86;C:\Program Files %28x86%29\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\VulkanSDK\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\VulkanSDK\Include;C:\Program Files %28x86%29\OpenGL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\OpenGL\lib\x86;C:\Program Files %28x86%29\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\VulkanSDK\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\VulkanSDK\Include;C:\Program Files %28x86%29\OpenGL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\OpenGL\lib\x64;C:\Program Files %28x86%29\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\VulkanSDK\Include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files %28x86%29\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Program Files %28x86%29\VulkanSDK\Include;C:\Program Files %28x86%29\OpenGL\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\OpenGL\lib\x64;C:\Program Files %28x86%29\VulkanSDK\Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -150,6 +150,7 @@
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="Graphics_DirectX11.cpp" />
     <ClCompile Include="Graphics_DirectX12.cpp" />
+    <ClCompile Include="Graphics_OpenGL.cpp" />
     <ClCompile Include="Graphics_Vulkan.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Camera.cpp" />
@@ -162,6 +163,7 @@
     <ClInclude Include="Graphics_DirectX12.h" />
     <ClInclude Include="Graphics_Interface.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Graphics_OpenGL.h" />
     <ClInclude Include="Graphics_Vulkan.h" />
     <ClInclude Include="Object_Cube.h" />
     <ClInclude Include="Object_Interface.h" />
