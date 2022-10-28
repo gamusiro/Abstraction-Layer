@@ -171,6 +171,10 @@
     <ClInclude Include="Window_Desktop_Procedure.h" />
     <ClInclude Include="Window_Interface.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader.frag" />
+    <None Include="shader.vert" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

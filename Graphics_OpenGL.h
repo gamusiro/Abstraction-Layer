@@ -13,7 +13,7 @@
 #pragma comment(lib, "glew32s.lib")
 
 #include "Graphics_Interface.h"
-class Graphics_OpenGL : public IGraphics
+class GraphicsOpenGL : public IGraphics
 {
 public:
 	bool Init(int width, int height, void* handle) override;
@@ -29,7 +29,7 @@ public:
 
 private:
 	bool CreateConstantBuffers();
-
+	bool CreateShader(const char* vertexFile, const char* pixelFile);
 
 private:
 	HDC		m_device;
@@ -38,15 +38,17 @@ private:
 
 	enum DATA_TYPE
 	{
-		VERTEX,
+		VERTEX = 0,
 		NORMAL,
-		COLOR,
 		TEXCOORD
 	};
 
-	std::vector<structure::Vertex3D> m_vertexBuffer;
-	int m_worldMatrix;
-	int m_viewMatrix;
-	int m_projectionMatrix;
+	std::vector<std::vector<structure::Vertex3D>>	m_vertexBuffer;
+	std::vector<std::vector<unsigned int>>			m_indexBuffer;
+
+	GLuint m_programID;
+	GLuint m_worldMatrix;
+	GLuint m_viewMatrix;
+	GLuint m_projectionMatrix;
 };
 

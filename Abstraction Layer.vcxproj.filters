@@ -93,4 +93,8 @@
       <UniqueIdentifier>{3b29cda2-365c-467e-bb7d-970bf9f29a01}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader.frag" />
+    <None Include="shader.vert" />
+  </ItemGroup>
 </Project>

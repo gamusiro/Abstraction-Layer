@@ -46,7 +46,7 @@ bool Application::Init()
         m_graphics = new GraphicsDirectX12();
         break;
     case Application::USING_API_TYPE::OPENGL:
-        m_graphics = new Graphics_OpenGL();
+        m_graphics = new GraphicsOpenGL();
         break;
     case Application::USING_API_TYPE::VULKAN:
         m_graphics = new GraphicsVulkan();
@@ -64,7 +64,7 @@ bool Application::Init()
     m_camera = new ObjectCamera();
     m_camera->Init(m_width, m_height);
 
-    m_cubes.resize(5);
+    m_cubes.resize(20);
     for (size_t i = 0; i < m_cubes.size(); ++i)
     {
         m_cubes[i] = new ObjectCube();
