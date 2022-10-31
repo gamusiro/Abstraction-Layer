@@ -120,7 +120,7 @@ void GraphicsDirectX12::Present()
 
 	// Execute command list
 	std::vector<ID3D12CommandList*> commandLists{ m_commandList };
-	m_commandQueue->ExecuteCommandLists(commandLists.size(), &commandLists[0]);
+	m_commandQueue->ExecuteCommandLists(UINT(commandLists.size()), &commandLists[0]);
 
 	// Wait
 	m_commandQueue->Signal(m_fence, ++m_fenceValue);
@@ -150,7 +150,7 @@ int GraphicsDirectX12::CreateVertexBufferAndIndexBuffer(
 	const unsigned int* iData, size_t iDataNum
 )
 {
-	int retIndex = m_vertexBuffers.size();
+	int retIndex = int(m_vertexBuffers.size());
 
 	HRESULT ret{};
 	D3D12_HEAP_PROPERTIES heapProperties{};
@@ -170,7 +170,7 @@ int GraphicsDirectX12::CreateVertexBufferAndIndexBuffer(
 	resourceDesc.Layout				= D3D12_TEXTURE_LAYOUT::D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	// Create vertex buffer
-	ID3D12Resource* vertexBuffer;
+	ID3D12Resource* vertexBuffer{};
 	ret = m_device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAGS::D3D12_HEAP_FLAG_NONE,
@@ -183,7 +183,7 @@ int GraphicsDirectX12::CreateVertexBufferAndIndexBuffer(
 	if (FAILED(ret))
 		return -1;
 
-	Vertex3D* vertexMap;
+	Vertex3D* vertexMap{};
 	ret = vertexBuffer->Map(0, nullptr, (void**)&vertexMap);
 	if (FAILED(ret))
 		return -1;
@@ -194,7 +194,7 @@ int GraphicsDirectX12::CreateVertexBufferAndIndexBuffer(
 	m_vertexBuffers.push_back(vertexBuffer);
 
 	// Create index buffer
-	ID3D12Resource* indexBuffer;
+	ID3D12Resource* indexBuffer{};
 	resourceDesc.Width	= sizeof(unsigned int) * iDataNum;
 	ret = m_device->CreateCommittedResource(
 		&heapProperties,
@@ -208,7 +208,7 @@ int GraphicsDirectX12::CreateVertexBufferAndIndexBuffer(
 	if (FAILED(ret))
 		return -1;
 
-	unsigned int* indexMap;
+	unsigned int* indexMap{};
 	ret = indexBuffer->Map(0, nullptr, (void**)&indexMap);
 	if (FAILED(ret))
 		return -1;
@@ -226,7 +226,7 @@ int GraphicsDirectX12::CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index)
 {
 	UNREFERENCED_PARAMETER(index);
 
-	int retIndex = m_constantBuffers.size();
+	int retIndex = int(m_constantBuffers.size());
 
 	HRESULT ret{};
 	D3D12_HEAP_PROPERTIES heapProperties{};
@@ -246,7 +246,7 @@ int GraphicsDirectX12::CreateMatrixBuffer(CONSTANT_BUFFER_INDEX index)
 	resourceDesc.Layout				= D3D12_TEXTURE_LAYOUT::D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
 
 	// Create constant buffer
-	ID3D12Resource* constantBuffer;
+	ID3D12Resource* constantBuffer{};
 	ret = m_device->CreateCommittedResource(
 		&heapProperties,
 		D3D12_HEAP_FLAGS::D3D12_HEAP_FLAG_NONE,
@@ -325,7 +325,7 @@ void GraphicsDirectX12::DrawIndex(int index)
 	m_commandList->IASetVertexBuffers(0, 1, &vView);
 	m_commandList->IASetIndexBuffer(&iView);
 	m_commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY::D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	m_commandList->DrawIndexedInstanced(m_indexBuffers[index].indexNum, 1, 0, 0, 0);
+	m_commandList->DrawIndexedInstanced(UINT(m_indexBuffers[index].indexNum), 1, 0, 0, 0);
 }
 
 // Create device and swapchain

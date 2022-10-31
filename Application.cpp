@@ -15,6 +15,10 @@
 #include "Camera.h"
 #include "Object_Cube.h"
 
+// Draw cube count
+#define CUBE_NUM 20
+
+
 /* graphics class instance */
 IGraphics*                  Application::m_graphics = nullptr;
 Application::USING_API_TYPE Application::m_apiType;
@@ -23,7 +27,8 @@ Application::USING_API_TYPE Application::m_apiType;
 
 /* Constructor */
 Application::Application(const int width, const int height, const void* hInstance, USING_API_TYPE type)
-    : WindowDesktop(width, height, (HINSTANCE)hInstance, L"Application", DefMyWndProc)
+    : WindowDesktop(width, height, (HINSTANCE)hInstance, L"Application", DefMyWndProc),
+    m_camera(nullptr)
 {
     m_apiType = type;
 }
@@ -55,16 +60,16 @@ bool Application::Init()
         return false;
     }
 
-    if (!m_graphics) 
-        return false;
-
+    // Initialize graphics class
     if (!m_graphics->Init(m_width, m_height, this->GetHandle())) 
         return false;
     
+    // Initialize camera class
     m_camera = new ObjectCamera();
     m_camera->Init(m_width, m_height);
 
-    m_cubes.resize(20);
+    // Initialize cube class
+    m_cubes.resize(CUBE_NUM);
     for (size_t i = 0; i < m_cubes.size(); ++i)
     {
         m_cubes[i] = new ObjectCube();
@@ -97,7 +102,8 @@ void Application::Uninit()
 /* Update */
 void Application::Upadte()
 {
-    static float rad;
+    // Rotate cube
+    static float rad{};
     rad += 0.01f;
 
     for (size_t i = 0; i < m_cubes.size(); ++i)

@@ -10,9 +10,34 @@
 
 #include "Graphics_Interface.h"
 
+
+
 class GraphicsDirectX11 : public IGraphics
 {
 public:
+	//**************************************************
+	/// \brief Constructor
+	/// 
+	/// \return none
+	//**************************************************
+	GraphicsDirectX11()
+		:m_device(),
+		m_context(),
+		m_swapChain(),
+		m_renderTargetView(),
+		m_depthStencilView(),
+		m_rasterizerState(),
+		m_blendState(),
+		m_depthStencilState(),
+		m_samplerState(),
+		m_modelMatrix(),
+		m_viewMatrix(),
+		m_projectionMatrix(),
+		m_inputLayout(),
+		m_vertexShader(),
+		m_pixelShader()
+	{}
+
 	//**************************************************
 	/// \brief Initialize DirectX11 
 	/// 

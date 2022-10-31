@@ -30,6 +30,38 @@ private:
 
 public:
 	//**************************************************
+	/// \brief Constructor
+	/// 
+	/// \return none
+	//**************************************************
+	GraphicsVulkan()
+		:m_instance(),
+		m_physicalDevice(),
+		m_physicalDeviceMemory(),
+		m_graphicsQueueIndex(),
+		m_device(),
+		m_deviceQueue(),
+		m_commandPool(),
+		m_surface(),
+		m_surfaceCapability(),
+		m_surfaceFormat(),
+		m_swapchain(),
+		m_swapchainExtent(),
+		m_depthBuffer(),
+		m_depthBufferMemory(),
+		m_depthBufferView(),
+		m_renderPass(),
+		m_renderSem(),
+		m_presentSem(),
+		m_imageIndex(),
+		m_pipelineLayout(),
+		m_pipeline(),
+		m_descriptorLayout(),
+		m_view(),
+		m_proj()
+	{}
+
+	//**************************************************
 	/// \brief Initialize Vulkan
 	/// 
 	/// \return Success is true
@@ -282,7 +314,6 @@ private:
 
 	std::vector<UniformBuffer>			m_uniformBuffers;		// Constant buffers
 	VkDescriptorSetLayout				m_descriptorLayout;		// Vulkan descriptor layout
-	std::vector<VkDescriptorSet>		m_descriptorSets;		//
 
 
 	DirectX::XMMATRIX					m_view;

@@ -50,7 +50,7 @@ bool GraphicsOpenGL::Init(int width, int height, void* handle)
     glViewport(0, 0, width, height);
 
     // Create vertex layout
-    glEnableVertexAttribArray(DATA_TYPE::VERTEX);
+    glEnableVertexAttribArray(DATA_TYPE::POSITION);
     glEnableVertexAttribArray(DATA_TYPE::NORMAL);
     glEnableVertexAttribArray(DATA_TYPE::TEXCOORD);
 
@@ -73,7 +73,7 @@ void GraphicsOpenGL::Uninit()
 {
     glDisableVertexAttribArray(DATA_TYPE::TEXCOORD);
     glDisableVertexAttribArray(DATA_TYPE::NORMAL);
-    glDisableVertexAttribArray(DATA_TYPE::VERTEX);
+    glDisableVertexAttribArray(DATA_TYPE::POSITION);
 
     wglMakeCurrent(nullptr, nullptr);
     wglDeleteContext(m_context);
@@ -114,6 +114,8 @@ int GraphicsOpenGL::CreateVertexBufferAndIndexBuffer(const structure::Vertex3D* 
 /* Set world matrix */
 void GraphicsOpenGL::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const DirectX::XMFLOAT3 rot3, const DirectX::XMFLOAT3 scl3)
 {
+    UNREFERENCED_PARAMETER(id);
+
     DirectX::XMMATRIX world, trl, rot, scl;
     trl = DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&pos3));
     rot = DirectX::XMMatrixRotationRollPitchYawFromVector(DirectX::XMLoadFloat3(&rot3));
@@ -126,6 +128,7 @@ void GraphicsOpenGL::SetWorldMatrix(int id, const DirectX::XMFLOAT3 pos3, const 
 /* Set view matrix */
 void GraphicsOpenGL::SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const DirectX::XMFLOAT3 target, const DirectX::XMFLOAT3 up)
 {
+    UNREFERENCED_PARAMETER(id);
     DirectX::XMMATRIX view = DirectX::XMMatrixLookAtRH(DirectX::XMLoadFloat3(&pos), DirectX::XMLoadFloat3(&target), DirectX::XMLoadFloat3(&up));
     
     glUniformMatrix4fv(m_viewMatrix, 1, GL_FALSE, &view.r[0].m128_f32[0]);
@@ -134,6 +137,7 @@ void GraphicsOpenGL::SetViewMatrix(int id, const DirectX::XMFLOAT3 pos, const Di
 /* Set projection matrix */
 void GraphicsOpenGL::SetProjectionMatrix(int id, float fov, float aspect, float nearZ, float farZ)
 {
+    UNREFERENCED_PARAMETER(id);
     DirectX::XMMATRIX proj = DirectX::XMMatrixPerspectiveFovRH(fov, aspect, nearZ, farZ);
 
     glUniformMatrix4fv(m_projectionMatrix, 1, GL_FALSE, &proj.r[0].m128_f32[0]);
@@ -142,14 +146,11 @@ void GraphicsOpenGL::SetProjectionMatrix(int id, float fov, float aspect, float 
 /* Draw call */
 void GraphicsOpenGL::DrawIndex(int id)
 {
-    if (!m_vertexBuffer.empty())
-    {// Debug —p
-        glVertexAttribPointer(DATA_TYPE::VERTEX, 3, GL_FLOAT, false, sizeof(Vertex3D), &m_vertexBuffer[id][0].Position);
-        glVertexAttribPointer(DATA_TYPE::NORMAL, 3, GL_FLOAT, false, sizeof(Vertex3D), &m_vertexBuffer[id][0].Normal);
-        glVertexAttribPointer(DATA_TYPE::TEXCOORD, 2, GL_FLOAT, false, sizeof(Vertex3D), &m_vertexBuffer[id][0].TexCoord);
+    glVertexAttribPointer(DATA_TYPE::POSITION, 3, GL_FLOAT, false, sizeof(Vertex3D), &m_vertexBuffer[id][0].Position);
+    glVertexAttribPointer(DATA_TYPE::NORMAL,   3, GL_FLOAT, false, sizeof(Vertex3D), &m_vertexBuffer[id][0].Normal);
+    glVertexAttribPointer(DATA_TYPE::TEXCOORD, 2, GL_FLOAT, false, sizeof(Vertex3D), &m_vertexBuffer[id][0].TexCoord);
 
-        glDrawElements(GL_TRIANGLES, m_indexBuffer[id].size(), GL_UNSIGNED_INT, m_indexBuffer[id].data());
-    }
+    glDrawElements(GL_TRIANGLES, GLsizei(m_indexBuffer[id].size()), GL_UNSIGNED_INT, m_indexBuffer[id].data());
 }
 
 // Create constant buffer

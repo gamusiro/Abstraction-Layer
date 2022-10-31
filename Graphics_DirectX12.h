@@ -13,9 +13,34 @@
 
 #include "Graphics_Interface.h"
 
+
+
 class GraphicsDirectX12 : public IGraphics
 {
 public:
+	//**************************************************
+	/// \brief Constructor
+	/// 
+	/// \return none
+	//**************************************************
+	GraphicsDirectX12()
+		:m_device(),
+		m_commandAllocator(),
+		m_commandList(),
+		m_commandQueue(),
+		m_swapChain(),
+		m_renderTargetViewHeap(),
+		m_backBuffers(),
+		m_depthBuffer(),
+		m_depthBufferHeap(),
+		m_fence(),
+		m_fenceValue(),
+		m_rootSignature(),
+		m_pipelineState(),
+		m_viewport(),
+		m_scissorRect()
+	{}
+
 	//**************************************************
 	/// \brief Initialize DirectX12 
 	/// 
@@ -222,11 +247,11 @@ private:
 	ID3D12Resource*				m_depthBuffer;
 	ID3D12DescriptorHeap*		m_depthBufferHeap;
 	ID3D12Fence*				m_fence;
-	UINT						m_fenceValue = 0;
+	UINT						m_fenceValue;
 	ID3D12RootSignature*		m_rootSignature;
 	ID3D12PipelineState*		m_pipelineState;
-	D3D12_VIEWPORT				m_viewport{};
-	D3D12_RECT					m_scissorRect{};
+	D3D12_VIEWPORT				m_viewport;
+	D3D12_RECT					m_scissorRect;
 
 	struct IndexInfo
 	{

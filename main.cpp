@@ -19,7 +19,7 @@ int __stdcall WinMain(
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	{
-		Application app(1280, 780, hInstance, Application::USING_API_TYPE::OPENGL);
+		Application app(1280, 780, hInstance, Application::USING_API_TYPE::DIRECTX_11);
 
 		if (app.Init())
 		{
